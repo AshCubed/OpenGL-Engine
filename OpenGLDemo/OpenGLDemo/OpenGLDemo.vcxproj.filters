@@ -22,4 +22,17 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="fragmentShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertexShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
