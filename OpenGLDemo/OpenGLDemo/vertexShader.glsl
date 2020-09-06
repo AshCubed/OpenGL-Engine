@@ -1,18 +1,20 @@
 #version 330 core
 
-layout(location=0) in vec3 aPos;
-layout(location=1) in vec3 aColor;
-layout(location=2) in vec2 aTexcoord;
+layout (location = 0) in vec3 vertex_position;
+layout (location = 1) in vec3 vertex_color;
+layout (location = 2) in vec2 vertex_texcoord;
 
-out vec3 ourPosition;
-out vec3 ourColor;
-out vec2 outTexcoord;
+out vec3 vs_position;
+out vec3 vs_color;
+out vec2 vs_texcoord;
+
+uniform mat4 ModelMatrix;
 
 void main()
 {
-	ourPosition = aPos;
-	ourColor = aColor;
-	outTexcoord = vec2(aTexcoord.x, aTexcoord.y * -1.f);
-	gl_Position = vec4(aPos, 1.0);
-	
+    vs_position = vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
+    vs_color = vertex_color;
+    vs_texcoord = vec2(vertex_texcoord.x, vertex_texcoord.y * -1.f);
+
+    gl_Position = ModelMatrix * vec4(vertex_position, 1.f);
 }

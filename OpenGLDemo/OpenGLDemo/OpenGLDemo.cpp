@@ -13,16 +13,20 @@ using namespace std;
 Vertex vertices[] =
 {
     //Position
-    glm::vec3(0.0f, 0.5f, 0.f),         glm::vec3(1.f, 0.f, 0.f),   glm::vec2(0.f, 1.f),
+    glm::vec3(-0.5f, 0.5f, 0.f),        glm::vec3(1.f, 0.f, 0.f),   glm::vec2(0.f, 1.f),
     glm::vec3(-0.5f, -0.5f, 0.f),       glm::vec3(0.f, 1.f, 0.f),   glm::vec2(0.f, 0.f),
-    glm::vec3(0.5f, -0.5f, 0.f),        glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 0.f)
+    glm::vec3(0.5f, -0.5f, 0.f),        glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 0.f),
+    glm::vec3(0.5f, 0.5f, 0.f),         glm::vec3(1.f, 1.f, 0.f),   glm::vec2(1.f, 1.f)
 };
 unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
 GLuint indicies[] =
 {
-    0, 1, 2
+    0, 1, 2,    //Triangle 1
+    0, 2, 3     //Triangle 2
 };
+
+unsigned nrOfIndicies = sizeof(indicies) / sizeof(GLuint);
 
 void updateInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -222,6 +226,76 @@ int main(void)
     //BIND VAO 0
     glBindVertexArray(0);
 
+    //TEXTURE INIT
+    //Texture 0
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char *image = SOIL_load_image("C:/Users/ashju/Desktop/NANI.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+
+
+    GLuint texture0;
+    glGenTextures(1, &texture0);
+    glBindTexture(GL_TEXTURE_2D,texture0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    if (image != NULL)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
+    }
+
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    SOIL_free_image_data(image);
+
+    //Texture 1
+    int image_width1 = 0;
+    int image_height1 = 0;
+    unsigned char* image1 = SOIL_load_image("C:/Users/ashju/Desktop/Shrek_MMH.png", &image_width1, &image_height1, NULL, SOIL_LOAD_RGBA);
+
+    GLuint texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    if (image1 != NULL)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width1, image_height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
+    }
+
+    glActiveTexture(1);
+    glBindTexture(GL_TEXTURE_2D, 1);
+    SOIL_free_image_data(image1);
+
+    glm::mat4 ModelMatrix(1.f);
+    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
+    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
+
+    glUseProgram(shaderProgram);
+
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
+    glUseProgram(0);
 
     //MAIN LOOP
     while (!glfwWindowShouldClose(window))
@@ -240,11 +314,30 @@ int main(void)
         //USE PROGRAM
         glUseProgram(shaderProgram);
 
+        //Update uniforms
+        glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
+        glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 1);
+
+        //Mode, Rotate, and Scale
+        ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.04f), glm::vec3(1.f, 0.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.02f), glm::vec3(0.f, 1.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.01f), glm::vec3(0.f, 0.f, 1.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
+        //Activate Texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+
         //Bind Vertex Array object
         glBindVertexArray(VAO);
 
         //Draw
-        glDrawElements(GL_TRIANGLES, nrOfVertices, GL_UNSIGNED_INT, 0);
+        //glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
+        glDrawElements(GL_TRIANGLES, nrOfIndicies, GL_UNSIGNED_INT, 0);
 
         //End Draw
         glfwSwapBuffers(window);
