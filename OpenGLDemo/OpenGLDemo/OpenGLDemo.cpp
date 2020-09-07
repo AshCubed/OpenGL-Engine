@@ -6,11 +6,11 @@ using namespace std;
 
 Vertex vertices[] =
 {
-    //Position                          //Color                     //TexCoord
-    glm::vec3(-0.5f, 0.5f, 0.f),        glm::vec3(1.f, 0.f, 0.f),   glm::vec2(0.f, 1.f),
-    glm::vec3(-0.5f, -0.5f, 0.f),       glm::vec3(0.f, 1.f, 0.f),   glm::vec2(0.f, 0.f),
-    glm::vec3(0.5f, -0.5f, 0.f),        glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 0.f),
-    glm::vec3(0.5f, 0.5f, 0.f),         glm::vec3(1.f, 1.f, 0.f),   glm::vec2(1.f, 1.f)
+    //Position                          //Color                     //TexCoord              //Normals                  
+    glm::vec3(-0.5f, 0.5f, 0.f),        glm::vec3(1.f, 0.f, 0.f),   glm::vec2(0.f, 1.f),    glm::vec3(0.f, 0.f, 1.f),
+    glm::vec3(-0.5f, -0.5f, 0.f),       glm::vec3(0.f, 1.f, 0.f),   glm::vec2(0.f, 0.f),    glm::vec3(0.f, 0.f, 1.f),
+    glm::vec3(0.5f, -0.5f, 0.f),        glm::vec3(0.f, 0.f, 1.f),   glm::vec2(1.f, 0.f),    glm::vec3(0.f, 0.f, 1.f),
+    glm::vec3(0.5f, 0.5f, 0.f),         glm::vec3(1.f, 1.f, 0.f),   glm::vec2(1.f, 1.f),    glm::vec3(0.f, 0.f, 1.f)
 };
 unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
@@ -24,134 +24,136 @@ unsigned nrOfIndicies = sizeof(indicies) / sizeof(GLuint);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-bool loadShaders(GLuint& program) {
-    bool loadSuccess = true;
-    char infoLog[512];
-    GLint success;
+//OLD LOAD SHADERS FUNCTION CODE
 
-    string temp = "";
-    string src = "";
-
-    ifstream in_file;
-
-    //VertexShader
-    #pragma region VertexShaderCode
-    in_file.open("vertexShader.glsl");
-
-    if (in_file.is_open())
-    {
-        while (getline(in_file, temp)) {
-            src += temp + "\n";
-        }
-    }
-    else {
-        cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_VERTEX_FILE" << "\n";
-        loadSuccess = false;
-    }
-
-    in_file.close();
-
-    unsigned int vertexShader;
-    const GLchar* vertexShaderSource = src.c_str();
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        cout << "ERROR::LOADSHADDERS::COULD_NOT_COMPILE_VERTEX_SHADER" << "\n";
-        cout << infoLog << "\n";
-        loadSuccess = false;
-    }
-
-    temp = "";
-    src = "";
-#pragma endregion
-
-    //FragmentShader
-    #pragma region FragmentShaderCode
-    in_file.open("fragmentShader.glsl");
-
-    if (in_file.is_open())
-    {
-        while (getline(in_file, temp)) {
-            src += temp + "\n";
-        }
-    }
-    else {
-        cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_FRAGMENT_FILE" << "\n";
-        loadSuccess = false;
-    }
-
-    in_file.close();
-
-    unsigned int fragmentShader;
-    const GLchar* fragmentShaderSource = src.c_str();
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        cout << "ERROR::LOADSHADDERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << "\n";
-        cout << infoLog << "\n";
-        loadSuccess = false;
-    }
-
-    temp = "";
-    src = "";
-#pragma endregion
-
-    //Program
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        cout << "ERROR::LOADSHADDERS::COULD_NOT_LINK_PROGRAM" << "\n";
-        cout << infoLog << "\n";
-        loadSuccess = false;
-    }
-
-    //End
-    glUseProgram(0);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return loadSuccess;
-}
+//bool loadShaders(GLuint& program) {
+//    bool loadSuccess = true;
+//    char infoLog[512];
+//    GLint success;
+//
+//    string temp = "";
+//    string src = "";
+//
+//    ifstream in_file;
+//
+//    //VertexShader
+//    #pragma region VertexShaderCode
+//    in_file.open("vertexShader.glsl");
+//
+//    if (in_file.is_open())
+//    {
+//        while (getline(in_file, temp)) {
+//            src += temp + "\n";
+//        }
+//    }
+//    else {
+//        cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_VERTEX_FILE" << "\n";
+//        loadSuccess = false;
+//    }
+//
+//    in_file.close();
+//
+//    unsigned int vertexShader;
+//    const GLchar* vertexShaderSource = src.c_str();
+//    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+//    glCompileShader(vertexShader);
+//
+//    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+//    if (!success)
+//    {
+//        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+//        cout << "ERROR::LOADSHADDERS::COULD_NOT_COMPILE_VERTEX_SHADER" << "\n";
+//        cout << infoLog << "\n";
+//        loadSuccess = false;
+//    }
+//
+//    temp = "";
+//    src = "";
+//#pragma endregion
+//
+//    //FragmentShader
+//    #pragma region FragmentShaderCode
+//    in_file.open("fragmentShader.glsl");
+//
+//    if (in_file.is_open())
+//    {
+//        while (getline(in_file, temp)) {
+//            src += temp + "\n";
+//        }
+//    }
+//    else {
+//        cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_FRAGMENT_FILE" << "\n";
+//        loadSuccess = false;
+//    }
+//
+//    in_file.close();
+//
+//    unsigned int fragmentShader;
+//    const GLchar* fragmentShaderSource = src.c_str();
+//    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+//    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+//    glCompileShader(fragmentShader);
+//
+//    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+//    if (!success)
+//    {
+//        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+//        cout << "ERROR::LOADSHADDERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << "\n";
+//        cout << infoLog << "\n";
+//        loadSuccess = false;
+//    }
+//
+//    temp = "";
+//    src = "";
+//#pragma endregion
+//
+//    //Program
+//    glAttachShader(program, vertexShader);
+//    glAttachShader(program, fragmentShader);
+//    glLinkProgram(program);
+//
+//    glGetProgramiv(program, GL_LINK_STATUS, &success);
+//    if (!success)
+//    {
+//        glGetProgramInfoLog(program, 512, NULL, infoLog);
+//        cout << "ERROR::LOADSHADDERS::COULD_NOT_LINK_PROGRAM" << "\n";
+//        cout << infoLog << "\n";
+//        loadSuccess = false;
+//    }
+//
+//    //End
+//    glUseProgram(0);
+//    glDeleteShader(vertexShader);
+//    glDeleteShader(fragmentShader);
+//
+//    return loadSuccess;
+//}
 
 void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        position.z += 0.01f;
+        position.z -= 0.001f;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        position.x += 0.01f;
+        position.x -= 0.001f;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        position.z -= 0.01f;
+        position.z += 0.001f;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        position.x -= 0.01f;
+        position.x += 0.001f;
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
-        rotation.y -= 1.f;
+        rotation.y -= 0.1f;
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
     {
-        rotation.y += 1.f;
+        rotation.y += 0.1f;
     }
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -197,9 +199,9 @@ int main(void)
     //OPENGL OPTIONS
     glEnable(GL_DEPTH_TEST);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -208,14 +210,16 @@ int main(void)
 
     //SHADER INIT
     //loadShaders
-    unsigned int shaderProgram;
+    Shader shaderProgram("vertexShader.glsl", "fragmentShader.glsl");
+    /*GLuint shaderProgram;
     shaderProgram = glCreateProgram();
     if (loadShaders(shaderProgram) == false)
     {
         glfwTerminate();
-    }
+    }*/
 
-    //MODEL
+    //MODEL MESH
+    Mesh test(vertices, nrOfVertices, indicies, nrOfIndicies);
 
     //VAO, VBO, EBO
     //GEN VAO and BIND
@@ -245,78 +249,32 @@ int main(void)
     //Texcoord
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
     glEnableVertexAttribArray(2);
+    //Normal
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(3);
 
     //BIND VAO 0
     glBindVertexArray(0);
 
     //TEXTURE INIT
     //Texture 0
-    int image_width = 0;
-    int image_height = 0;
-    unsigned char *image = SOIL_load_image("C:/Users/ashju/Desktop/NANI.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
-
-
-    GLuint texture0;
-    glGenTextures(1, &texture0);
-    glBindTexture(GL_TEXTURE_2D,texture0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    if (image != NULL)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
-    }
-
-    glActiveTexture(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    SOIL_free_image_data(image);
-
+    Texture texture0("C:/Users/ashju/Desktop/NANI.png", GL_TEXTURE_2D, 0);
     //Texture 1
-    int image_width1 = 0;
-    int image_height1 = 0;
-    unsigned char* image1 = SOIL_load_image("C:/Users/ashju/Desktop/Shrek_MMH.png", &image_width1, &image_height1, NULL, SOIL_LOAD_RGBA);
+    Texture texture1("C:/Users/ashju/Desktop/Shrek_MMH.png", GL_TEXTURE_2D, 1);
 
-    GLuint texture1;
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    if (image1 != NULL)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width1, image_height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
-    }
-
-    glActiveTexture(1);
-    glBindTexture(GL_TEXTURE_2D, 1);
-    SOIL_free_image_data(image1);
-
+    //MATERIAL 0
+    Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), texture0.getTextureUnit(), texture1.getTextureUnit());
+   
     //INIT MATRICES
     glm::vec3 position(0.f);
-    glm::vec3 roataion(0.f);
+    glm::vec3 rotation(0.f);
     glm::vec3 scale(1.f);
 
     glm::mat4 ModelMatrix(1.f);
     ModelMatrix = glm::translate(ModelMatrix, position);
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roataion.x), glm::vec3(1.f, 0.f, 0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roataion.y), glm::vec3(0.f, 1.f, 0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roataion.z), glm::vec3(0.f, 0.f, 1.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
     ModelMatrix = glm::scale(ModelMatrix, glm::vec3(scale));
 
     glm::vec3 camPosition(0.f, 0.f, 2.f);
@@ -332,21 +290,26 @@ int main(void)
     ProjectionMatrix = glm::perspective(glm::radians(fov),
         static_cast<float>(framebufferWidth) / framebufferHeight, nearPlane, farPlane);
     
+    //LIGHTS
+    glm::vec3 lightPos0(0.f, 0.f, 2.f);
+
+
     //INIT UNIFORMS
-    glUseProgram(shaderProgram);
+    //glUseProgram(shaderProgram);
+    shaderProgram.setMat4fv(ModelMatrix, "ModelMatrix", false);
+    shaderProgram.setMat4fv(ViewMatrix, "ViewMatrix", false);
+    shaderProgram.setMat4fv(ProjectionMatrix, "ProjectionMatrix", false);
 
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
-
-    glUseProgram(0);
+    shaderProgram.setVec3f(lightPos0, "lightPos0");
+    shaderProgram.setVec3f(camPosition, "cameraPos");
+    
 
     //MAIN LOOP
     while (!glfwWindowShouldClose(window))
     {
         //UDATE INPUT
         glfwPollEvents();
-        updateInput(window, position, roataion, scale);
+        updateInput(window, position, rotation, scale);
 
         //UPDATE ---
 
@@ -355,21 +318,21 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        //USE PROGRAM
-        glUseProgram(shaderProgram);
+
 
         //Update uniforms
-        glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
-        glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 1);
+        shaderProgram.set1i(texture0.getTextureUnit(), "texture0");
+        shaderProgram.set1i(texture1.getTextureUnit(), "texture1");
+        material0.sendToShader(shaderProgram);
 
         //Mode, Rotate, and Scale
         ModelMatrix = glm::mat4(1.f);
         ModelMatrix = glm::translate(ModelMatrix, position);
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roataion.x), glm::vec3(1.f, 0.f, 0.f));
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roataion.y), glm::vec3(0.f, 1.f, 0.f));
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roataion.z), glm::vec3(0.f, 0.f, 1.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3(scale));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+        shaderProgram.setMat4fv(ModelMatrix, "ModelMatrix", false);
 
         glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
 
@@ -377,15 +340,16 @@ int main(void)
         ProjectionMatrix = glm::perspective(glm::radians(fov),
             static_cast<float>(framebufferWidth) / framebufferHeight, nearPlane, farPlane);
 
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
-
+        shaderProgram.setMat4fv(ProjectionMatrix, "ProjectionMatrix", false);
 
 
         //Activate Texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture0);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        texture0.bind();
+        texture1.bind();
+
+        //USE PROGRAM
+        shaderProgram.use();
+        //glUseProgram(shaderProgram);
 
         //Bind Vertex Array object
         glBindVertexArray(VAO);
@@ -393,6 +357,8 @@ int main(void)
         //Draw
         //glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
         glDrawElements(GL_TRIANGLES, nrOfIndicies, GL_UNSIGNED_INT, 0);
+
+        test.render(&shaderProgram);
 
         //End Draw
         glfwSwapBuffers(window);

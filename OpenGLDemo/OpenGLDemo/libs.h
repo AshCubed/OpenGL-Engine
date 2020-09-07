@@ -20,11 +20,9 @@
 
 #include<SOIL2.h>
 
+#include "Shader.h"
+#include "Texture.h"
+#include "Material.h"
+#include "Vertex.h"
+#include "Mesh.h"
 
-
-struct Vertex
-{
-	glm::vec3 position;
-	glm::vec3 color;
-	glm::vec2 texcoord;
-};
