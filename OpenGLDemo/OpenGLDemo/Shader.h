@@ -6,9 +6,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+
+
 #include<glm/glm.hpp>
-
-
 #include<glm/vec2.hpp>
 #include<glm/vec3.hpp>
 #include<glm/vec4.hpp>
@@ -22,6 +22,8 @@ class Shader
 private:
 	//Member Variables
 	GLuint id;
+	const int versionMajor;
+	const int versionMinor;
 
 	//Private Functions
 	std::string loadShaderSource(const char* fileName) {
@@ -44,6 +46,9 @@ private:
 		}
 
 		in_file.close();
+
+		std::string versionNr = to_string(versionMajor) + to_string(versionMinor) + "0";
+		src.replace(src.find("#version"), 12, ("#version " + versionNr));
 
 		return src;
 	}
@@ -98,7 +103,9 @@ private:
 public:
 	
 	//Constructors/Destructors
-	Shader(const char* vertexFile, const char* fragmentFile, const char* geometryFile = "") {
+	Shader(const int versionMajor, const int versionMinor, const char* vertexFile, const char* fragmentFile, const char* geometryFile = "")
+		: versionMajor(versionMajor), versionMinor(versionMinor)
+	{
 		GLuint vertexShader = 0;
 		GLuint geometryShader = 0;
 		GLuint fragmentShader = 0;
