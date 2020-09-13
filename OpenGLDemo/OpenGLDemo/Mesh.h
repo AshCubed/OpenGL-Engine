@@ -38,10 +38,12 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices * sizeof(Vertex), primitative->getVertices(), GL_STATIC_DRAW);
 
 		//GEN EBO AND BIND AND SEND DATA
-		glGenBuffers(1, &this->EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies * sizeof(GLuint), primitative->getIndicies(), GL_STATIC_DRAW);
-
+		if (this->nrOfIndicies > 0)
+		{
+			glGenBuffers(1, &this->EBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies * sizeof(GLuint), primitative->getIndicies(), GL_STATIC_DRAW);
+		}
 		//SET VERTEX POINTERS AND ENABLE (INPUT ASSEMVLY)
 		//Position
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
@@ -78,10 +80,13 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices * sizeof(Vertex), vertexArray, GL_STATIC_DRAW);
 
 		//GEN EBO AND BIND AND SEND DATA
-		glGenBuffers(1, &this->EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies* sizeof(GLuint), indexArray, GL_STATIC_DRAW);
-
+		if (this->nrOfIndicies > 0)
+		{
+			glGenBuffers(1, &this->EBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies * sizeof(GLuint), indexArray, GL_STATIC_DRAW);
+		}
+		
 		//SET VERTEX POINTERS AND ENABLE (INPUT ASSEMVLY)
 		//Position
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
@@ -144,7 +149,10 @@ public:
 	~Mesh() {
 		glDeleteVertexArrays(1, &this->VAO);
 		glDeleteBuffers(1, &this->VBO);
-		glDeleteBuffers(1, &this->EBO);
+		if (this->nrOfIndicies > 0)
+		{
+			glDeleteBuffers(1, &this->EBO);
+		}
 	}
 
 	//ACCESSORS
@@ -192,14 +200,14 @@ public:
 		glBindVertexArray(this->VAO);
 		
 		//RENDER
-		/*if (this->indicies.empty())
+		if (this->nrOfIndicies == 0)
 		{
 			glDrawArrays(GL_TRIANGLES, 0, this->nrOfVertices);
 		}
 		else
 		{
 			glDrawElements(GL_TRIANGLES, this->nrOfIndicies, GL_UNSIGNED_INT, 0);
-		}*/
-		glDrawElements(GL_TRIANGLES, this->nrOfIndicies, GL_UNSIGNED_INT, 0);
+		}
+		
 	};
 };

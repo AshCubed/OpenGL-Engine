@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include<SOIL2.h>
+#include <SOIL2.h>
 
 using namespace std;
 
@@ -15,13 +15,11 @@ private:
 	int height;
 	int width;
     unsigned int type;
-    GLint textureUnit;
 
 
 public:
-	Texture(const char* fileName, GLenum type, GLint texture_Unit) {
+	Texture(const char* fileName, GLenum type) {
         this->type = type;
-        this->textureUnit = texture_Unit;
 
         //load the imahe
         unsigned char* image = SOIL_load_image(fileName,&this->width, &this->height, NULL, SOIL_LOAD_RGBA);
@@ -58,18 +56,14 @@ public:
 
 
     //Dynamicall choose what texture unit to use
-    void bind() {
-        glActiveTexture(GL_TEXTURE0 + this-> textureUnit);
+    void bind(const GLint texture_unit) {
+        glActiveTexture(GL_TEXTURE0 + texture_unit);
         glBindTexture(type, this->id);
     }
 
     void unBind() {
         glActiveTexture(0);
         glBindTexture(this->type, 0);
-    }
-
-    GLint getTextureUnit() const {
-        return this->textureUnit;
     }
 
     void loadFromFile(const char* fileName) {

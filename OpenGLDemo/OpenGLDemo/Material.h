@@ -26,7 +26,8 @@ public:
     glm::vec3 diffues,
     glm::vec3 specular,
     GLint diffuseTex,
-    GLint specularTex){
+    GLint specularTex)
+    {
         this->ambient = ambient;
         this->diffues = diffues;
         this->specular = specular;
