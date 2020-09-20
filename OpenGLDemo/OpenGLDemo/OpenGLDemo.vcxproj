@@ -153,6 +153,7 @@
     <None Include="vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="libs.h" />
     <ClInclude Include="Material.h" />

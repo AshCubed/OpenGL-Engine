@@ -136,15 +136,15 @@ void Game::initUniforms()
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(ProjectionMatrix, "ProjectionMatrix", false);
 
     this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
-    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "cameraPos");
 }
 
 void Game::updateUniforms()
 {
     //Update View Matix (camera)
-    this->ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
+    this->ViewMatrix = this->camera.getViewMatrix();
 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "cameraPos");
 
     //Update uniforms
     //this->shaders[SHADER_CORE_PROGRAM]->set1i(0, "texture0");
@@ -169,25 +169,25 @@ void Game::updateKeyboardInputs()
     //Program
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
-        glfwWindowShouldClose(this->window);
+        glfwSetWindowShouldClose(this->window, GLFW_TRUE);
     }
 
     //Camera
     if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        this->camPosition.z -= 0.005f;
+        this->camera.move(this->dt, FORWARD);
     }
     if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        this->camPosition.x += 0.005f;
+        this->camera.move(this->dt, LEFT);
     }
     if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        this->camPosition.z += 0.005f;
+        this->camera.move(this->dt, BACKWARD);
     }
     if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        this->camPosition.x -= 0.005f;
+        this->camera.move(this->dt, RIGHT);
     }
     if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
     {
@@ -206,7 +206,7 @@ void Game::updateDT()
     this->lastTime = this->curTime;
 }
 
-void Game::updateMouseImputs()
+void Game::updateMouseInputs()
 {
     glfwGetCursorPos(this->window, &this->mouseX, &this->mouseY);
 
@@ -231,10 +231,10 @@ void Game::updateInput()
     glfwPollEvents();
 
     this->updateKeyboardInputs();
-    this->updateMouseImputs();
+    this->updateMouseInputs();
+
+    this->camera.updateInput(dt, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
-
-
 
 
 
@@ -247,7 +247,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     WINDOW_WIDTH(WINDOW_WIDTH),
     WINDOW_HEIGHT(WINDOW_HEIGHT),
     GL_VERSION_MAJOR(GL_VERSION_MAJOR), 
-    GL_VERSION_MINOR(GL_VERSION_MINOR)
+    GL_VERSION_MINOR(GL_VERSION_MINOR),
+    camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 {
     //Init variables
     this->window = nullptr;
@@ -330,6 +331,9 @@ void Game::update()
     glfwPollEvents();
     this->updateInput();
     this->updateDT();
+
+    //this->meshes[0]->rotate(glm::vec3(0.f, 0.01f, 0.f));
+    
 }
 
 void Game::render()
@@ -339,7 +343,7 @@ void Game::render()
 
     //DRAW ---
     //Clear
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     //Update the Uniforms

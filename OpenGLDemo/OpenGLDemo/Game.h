@@ -1,5 +1,6 @@
 #pragma once
 #include"libs.h"
+#include "Camera.h"
 
 //ENUMERATIONS
 enum shader_enums {
@@ -40,6 +41,10 @@ private:
 	double mouseOffsetX;
 	double mouseOffsetY;
 	bool firstMouse;
+
+	//Camera
+	Camera camera;
+
 	//Matricies
 	glm::mat4 ViewMatrix;
 	glm::vec3 camPosition;
@@ -84,7 +89,7 @@ private:
 	//Inputs
 	void updateKeyboardInputs();
 	void updateDT();
-	void updateMouseImputs();
+	void updateMouseInputs();
 	void updateInput();
 
 
