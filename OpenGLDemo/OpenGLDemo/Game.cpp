@@ -102,30 +102,82 @@ void Game::initMaterials()
         0, 1));
 }
 
-void Game::initMeshes()
+void Game::initModels()
 {
-    this->meshes.push_back(
+    std::vector<Mesh*> meshes;
+    std::vector<Mesh*> meshes2;
+
+    meshes.push_back(
         new Mesh(
             &Pyramid(),
-            glm::vec3(0.f),
-            glm::vec3(0.f),
-            glm::vec3(2.f)
-            )
-    );
-
-    this->meshes.push_back(
-        new Mesh(
-            &Quad(),
+            glm::vec3(0.f, 0.f, 0.f),
             glm::vec3(0.f),
             glm::vec3(0.f),
             glm::vec3(2.f)
         )
     );
+
+    meshes2.push_back(
+        new Mesh(
+            &Quad(),
+            glm::vec3(0.f, 0.f, 0.f),
+            glm::vec3(0.f),
+            glm::vec3(-90.f, 0.f, 0.f),
+            glm::vec3(100.f)
+        )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(2.f, 0.f, 0.f),
+        this->materials[0],
+        this->textures[TEX_NANI],
+        this->textures[TEX_NANI_SPECULAR],
+        meshes
+        )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(-2.f, 0.f, 0.f),
+        this->materials[0],
+        this->textures[TEX_SHREK_MMH1],
+        this->textures[TEX_SHREK_SPECULAR],
+        meshes
+        )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(2.f, -5.f, 2.f),
+        this->materials[0],
+        this->textures[TEX_SHREK_MMH1],
+        this->textures[TEX_SHREK_SPECULAR],
+        meshes2
+    )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(0.f, 0.f, 0.f),
+        this->materials[0],
+        this->textures[TEX_NANI],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/untitled.obj"
+    )
+    );
+
+    for (auto*& i : meshes)
+        delete i;
+
+    for (auto*& i : meshes2)
+        delete i;
+}
+
+void Game::initPointLights()
+{
+    this->pointLights.push_back(new PointLight(glm::vec3(0.f)));
 }
 
 void Game::initLights()
 {
-    this->lights.push_back(new glm::vec3((0.f, 0.f, 2.f)));
+    this->initPointLights();
 }
 
 void Game::initUniforms()
@@ -135,7 +187,9 @@ void Game::initUniforms()
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(ViewMatrix, "ViewMatrix", false);
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(ProjectionMatrix, "ProjectionMatrix", false);
 
-    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
+    for(PointLight * pl : this->pointLights) {
+        pl->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+    }
 }
 
 void Game::updateUniforms()
@@ -145,6 +199,10 @@ void Game::updateUniforms()
 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "cameraPos");
+
+    for (PointLight* pl : this->pointLights) {
+        pl->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+    }
 
     //Update uniforms
     //this->shaders[SHADER_CORE_PROGRAM]->set1i(0, "texture0");
@@ -224,6 +282,12 @@ void Game::updateMouseInputs()
     //Set last x and y
     this->lastMouseX = this->mouseX;
     this->lastMouseY = this->mouseY;
+
+    //Move Light
+    if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+    {
+        this->pointLights[0]->setPosition(this->camera.getPosition());
+    }
 }
 
 void Game::updateInput()
@@ -286,7 +350,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->initShaders();
     this->initTextures();
     this->initMaterials();
-    this->initMeshes();
+    this->initModels();
     this->initLights();
     this->initUniforms();
 }
@@ -304,11 +368,11 @@ Game::~Game() {
     for (size_t i = 0; i < this->materials.size(); i++)
         delete this->materials[i];
 
-    for (size_t i = 0; i < this->meshes.size(); i++)
-        delete this->meshes[i];
-
-    for (size_t i = 0; i < this->lights.size(); i++)
-        delete this->lights[i];
+    //for (auto*& i : this->meshes)
+    //    delete i;
+    
+    for (size_t i = 0; i < this->pointLights.size(); i++)
+        delete this->pointLights[i];
 }
 
 
@@ -332,8 +396,8 @@ void Game::update()
     this->updateInput();
     this->updateDT();
 
-    //this->meshes[0]->rotate(glm::vec3(0.f, 0.01f, 0.f));
-    
+    /*this->models[0]->rotate(glm::vec3(0.f, 0.01f, 0.f));
+    this->models[1]->rotate(glm::vec3(0.f, 0.01f, 0.f));*/
 }
 
 void Game::render()
@@ -346,29 +410,20 @@ void Game::render()
     //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    //Update the Uniforms
+    //Update the game uniforms
     this->updateUniforms();
 
-    //Update Uniforms
-    this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
-
-    //USE PROGRAM
-    this->shaders[SHADER_CORE_PROGRAM]->use();
-    //shaderProgram.use();
-    //glUseProgram(shaderProgram);
-
-    //Activate Texture
-    this->textures[TEX_NANI]->bind(0);
-    this->textures[TEX_NANI_SPECULAR]->bind(1);
-    //this->textures[TEX_SHREK_MMH1]->bind(1);
-
-    //Draw
-    this->meshes[MESH_QUAD]->render(this->shaders[SHADER_CORE_PROGRAM]);
+    //Render Models
+    for (auto& i : this->models) {
+        i->render(this->shaders[SHADER_CORE_PROGRAM]);
+    }
+   
 
     //End Draw
     glfwSwapBuffers(window);
     glFlush();
 
+    //Security, backup to unbind
     glBindVertexArray(0);
     glUseProgram(0);
     glActiveTexture(0);

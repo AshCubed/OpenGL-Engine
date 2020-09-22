@@ -10,7 +10,9 @@
 
 class Mesh {
 private:
+	Vertex* vertexArray;
 	unsigned nrOfVertices;
+	GLuint* indexArray;
 	unsigned nrOfIndicies;
 
 	GLuint VAO;
@@ -18,15 +20,12 @@ private:
 	GLuint EBO;
 
 	glm::vec3 position;
+	glm::vec3 origin;
 	glm::vec3 rotation;
 	glm::vec3 scale;
 	glm::mat4 ModelMatrix;
 	
-	void initVAO(Primitive* primitative) {
-		//SET variables
-		this->nrOfVertices = primitative->getnrOfVertices();
-		this->nrOfIndicies = primitative->getnrOfIndicies();
-
+	void initVAO() {
 		//GEN VAO and BIND
 		//CREATE VAO
 		glGenVertexArrays(1, &this->VAO);
@@ -35,58 +34,15 @@ private:
 		//GEN VBO AND BIND AND SEND DATA
 		glGenBuffers(1, &this->VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices * sizeof(Vertex), primitative->getVertices(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices * sizeof(Vertex), this->vertexArray, GL_STATIC_DRAW);
 
 		//GEN EBO AND BIND AND SEND DATA
 		if (this->nrOfIndicies > 0)
 		{
 			glGenBuffers(1, &this->EBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies * sizeof(GLuint), primitative->getIndicies(), GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies * sizeof(GLuint), this->indexArray, GL_STATIC_DRAW);
 		}
-		//SET VERTEX POINTERS AND ENABLE (INPUT ASSEMVLY)
-		//Position
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-		glEnableVertexAttribArray(0);
-		//Color
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-		glEnableVertexAttribArray(1);
-		//Texcoord
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
-		glEnableVertexAttribArray(2);
-		//Normal
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-		glEnableVertexAttribArray(3);
-
-		//BIND VAO 0
-		glBindVertexArray(0);
-	}
-	
-
-	void initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndicies) {
-		//SET variables
-		this->nrOfVertices = nrOfVertices;
-		this->nrOfIndicies = nrOfIndicies;
-
-		
-		//GEN VAO and BIND
-		//CREATE VAO
-		glGenVertexArrays(1, &this->VAO);
-		glBindVertexArray(this->VAO);
-
-		//GEN VBO AND BIND AND SEND DATA
-		glGenBuffers(1, &this->VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices * sizeof(Vertex), vertexArray, GL_STATIC_DRAW);
-
-		//GEN EBO AND BIND AND SEND DATA
-		if (this->nrOfIndicies > 0)
-		{
-			glGenBuffers(1, &this->EBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndicies * sizeof(GLuint), indexArray, GL_STATIC_DRAW);
-		}
-		
 		//SET VERTEX POINTERS AND ENABLE (INPUT ASSEMVLY)
 		//Position
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
@@ -111,38 +67,98 @@ private:
 
 	void updateModelMatrix() {
 		this->ModelMatrix = glm::mat4(1.f);
-		this->ModelMatrix = glm::translate(ModelMatrix, this->position);
+		this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin);
 		this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.x), glm::vec3(1.f, 0.f, 0.f));
 		this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.y), glm::vec3(0.f, 1.f, 0.f));
 		this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.z), glm::vec3(0.f, 0.f, 1.f));
-		this->ModelMatrix = glm::scale(this->ModelMatrix, glm::vec3(this->scale));
+		this->ModelMatrix = glm::translate(this->ModelMatrix, this->position - this->origin);
+		this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);
 	}
 
 
 public:
 	Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndicies, 
 		glm::vec3 position = glm::vec3(0.f),
+		glm::vec3 origin = glm::vec3(0.f),
 		glm::vec3 rotation = glm::vec3(0.f),
 		glm::vec3 scale = glm::vec3(1.f)) 
 	{
 		this->position = position;
+		this->origin = origin;
 		this->rotation = rotation;
 		this->scale = scale;
 
-		this->initVAO(vertexArray, nrOfVertices, indexArray, nrOfIndicies);
+		this->nrOfVertices = nrOfVertices;
+		this->nrOfIndicies = nrOfIndicies;
+		
+		this->vertexArray = new Vertex[this->nrOfVertices];
+		for (size_t i = 0; i < nrOfVertices; i++)
+		{
+			this->vertexArray[i] = vertexArray[i];
+		}
+
+		this->indexArray = new GLuint[this->nrOfIndicies];
+		for (size_t i = 0; i < nrOfIndicies; i++)
+		{
+			this->indexArray[i] = indexArray[i];
+		}
+
+		this->initVAO();
 		this->updateModelMatrix();
 	}
 
 	Mesh(Primitive* primitative, 
 		glm::vec3 position = glm::vec3(0.f),
+		glm::vec3 origin = glm::vec3(0.f),
 		glm::vec3 rotation = glm::vec3(0.f),
 		glm::vec3 scale = glm::vec3(1.f))
 	{
 		this->position = position;
+		this->origin = origin;
 		this->rotation = rotation;
 		this->scale = scale;
 
-		this->initVAO(primitative);
+		this->nrOfVertices = primitative->getnrOfVertices();
+		this->nrOfIndicies = primitative->getnrOfIndicies();
+
+		this->vertexArray = new Vertex[this->nrOfVertices];
+		for (size_t i = 0; i < this->nrOfVertices; i++)
+		{
+			this->vertexArray[i] = primitative->getVertices()[i];
+		}
+
+		this->indexArray = new GLuint[this->nrOfIndicies];
+		for (size_t i = 0; i < this->nrOfIndicies; i++)
+		{
+			this->indexArray[i] = primitative->getIndicies()[i];
+		}
+
+		this->initVAO();
+		this->updateModelMatrix();
+	}
+
+	Mesh(const Mesh& obj) {
+		this->position = obj.position;
+		this->origin = obj.origin;
+		this->rotation = obj.rotation;
+		this->scale = obj.scale;
+
+		this->nrOfVertices = obj.nrOfVertices;
+		this->nrOfIndicies = obj.nrOfIndicies;
+
+		this->vertexArray = new Vertex[this->nrOfVertices];
+		for (size_t i = 0; i < this->nrOfVertices; i++)
+		{
+			this->vertexArray[i] = obj.vertexArray[i];
+		}
+
+		this->indexArray = new GLuint[this->nrOfIndicies];
+		for (size_t i = 0; i < this->nrOfIndicies; i++)
+		{
+			this->indexArray[i] = obj.indexArray[i];
+		}
+
+		this->initVAO();
 		this->updateModelMatrix();
 	}
 
@@ -153,6 +169,9 @@ public:
 		{
 			glDeleteBuffers(1, &this->EBO);
 		}
+
+		delete[] this->vertexArray;
+		delete[] this->indexArray;
 	}
 
 	//ACCESSORS
@@ -161,6 +180,9 @@ public:
 	//MODIFIERS
 	void setPosition(const glm::vec3 position) {
 		this->position = position;
+	}
+	void setOrigin(const glm::vec3 origin) {
+		this->origin = origin;
 	}
 	void setRotation(const glm::vec3 roatation) {
 		this->rotation = roatation;
@@ -208,6 +230,11 @@ public:
 		{
 			glDrawElements(GL_TRIANGLES, this->nrOfIndicies, GL_UNSIGNED_INT, 0);
 		}
-		
+
+		//Cleanup
+		glBindVertexArray(0);
+		glUseProgram(0);
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	};
 };

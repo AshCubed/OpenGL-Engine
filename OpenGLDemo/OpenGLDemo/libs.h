@@ -27,4 +27,7 @@
 #include "Vertex.h"
 #include "Primitives.h"
 #include "Mesh.h"
+#include "Model.h"
+#include "Light.h"
+
 
