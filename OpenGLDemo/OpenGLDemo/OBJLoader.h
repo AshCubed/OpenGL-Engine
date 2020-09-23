@@ -138,7 +138,13 @@ static std::vector<Vertex> loadOBJ(const char* fileName) {
 	}
 
 	//DEBUG
-	std::cout << "Nr of vertices: " << vertices.size() << "\n";
+	int numOfTriangles = 0;
+	numOfTriangles = (vertex_positions.size() * 2) - 4;
+	std::cout << "Nr of Triangles: " << numOfTriangles << "\n";
+
+
+
+	//std::cout << "Nr of vertices: " << vertices.size() << "\n";
 
 	//Loaded success
 	std::cout << "OBJ file loaded!" << "\n";

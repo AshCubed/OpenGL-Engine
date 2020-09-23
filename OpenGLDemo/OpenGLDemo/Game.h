@@ -70,6 +70,12 @@ private:
 
 	//Lights
 	std::vector<PointLight*> pointLights;
+	std::vector<DirLight*> dirLights;
+	std::vector<SpotLight*> spotLights;
+
+	//FOR FPS COUNTER
+	double lastFPSTime;
+	int nbFrames;
 
 //Private Functions
 	void initGLFW();
@@ -81,7 +87,6 @@ private:
 	void initTextures();
 	void initMaterials();
 	void initModels();
-	void initPointLights();
 	void initLights();
 	void initUniforms();
 
@@ -114,6 +119,7 @@ public:
 //Functions
 	void update();
 	void render();
+	void fpsCounter();
 
 
 //Static Functions

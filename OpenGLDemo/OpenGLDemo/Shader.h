@@ -159,7 +159,7 @@ public:
 
 	void setVec3f(glm::fvec3 value, const GLchar* name) {
 		this->use();
-		glUniform3fv(glGetUniformLocation(this->id, name), 1, glm::value_ptr(value));
+		glUniform3fv(glGetUniformLocation(this->id, name), 1, glm::value_ptr(value));;
 		this->unUse();
 	}
 

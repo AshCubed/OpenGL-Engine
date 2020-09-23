@@ -107,59 +107,59 @@ void Game::initModels()
     std::vector<Mesh*> meshes;
     std::vector<Mesh*> meshes2;
 
-    meshes.push_back(
-        new Mesh(
-            &Pyramid(),
-            glm::vec3(0.f, 0.f, 0.f),
-            glm::vec3(0.f),
-            glm::vec3(0.f),
-            glm::vec3(2.f)
-        )
-    );
+    //meshes.push_back(
+    //    new Mesh(
+    //        &Pyramid(),
+    //        glm::vec3(0.f, 0.f, 0.f),
+    //        glm::vec3(0.f),
+    //        glm::vec3(0.f),
+    //        glm::vec3(2.f)
+    //    )
+    //);
 
-    meshes2.push_back(
-        new Mesh(
-            &Quad(),
-            glm::vec3(0.f, 0.f, 0.f),
-            glm::vec3(0.f),
-            glm::vec3(-90.f, 0.f, 0.f),
-            glm::vec3(100.f)
-        )
-    );
+    //meshes2.push_back(
+    //    new Mesh(
+    //        &Quad(),
+    //        glm::vec3(0.f, 0.f, 0.f),
+    //        glm::vec3(0.f),
+    //        glm::vec3(-90.f, 0.f, 0.f),
+    //        glm::vec3(100.f)
+    //    )
+    //);
 
-    this->models.push_back(new Model(
-        glm::vec3(2.f, 0.f, 0.f),
-        this->materials[0],
-        this->textures[TEX_NANI],
-        this->textures[TEX_NANI_SPECULAR],
-        meshes
-        )
-    );
+    //this->models.push_back(new Model(
+    //    glm::vec3(2.f, 0.f, 0.f),
+    //    this->materials[0],
+    //    this->textures[TEX_NANI],
+    //    this->textures[TEX_NANI_SPECULAR],
+    //    meshes
+    //    )
+    //);
 
-    this->models.push_back(new Model(
-        glm::vec3(-2.f, 0.f, 0.f),
-        this->materials[0],
-        this->textures[TEX_SHREK_MMH1],
-        this->textures[TEX_SHREK_SPECULAR],
-        meshes
-        )
-    );
+    //this->models.push_back(new Model(
+    //    glm::vec3(-2.f, 0.f, 0.f),
+    //    this->materials[0],
+    //    this->textures[TEX_SHREK_MMH1],
+    //    this->textures[TEX_SHREK_SPECULAR],
+    //    meshes
+    //    )
+    //);
 
-    this->models.push_back(new Model(
-        glm::vec3(2.f, -5.f, 2.f),
-        this->materials[0],
-        this->textures[TEX_SHREK_MMH1],
-        this->textures[TEX_SHREK_SPECULAR],
-        meshes2
-    )
-    );
+    //this->models.push_back(new Model(
+    //    glm::vec3(2.f, -5.f, 2.f),
+    //    this->materials[0],
+    //    this->textures[TEX_SHREK_MMH1],
+    //    this->textures[TEX_SHREK_SPECULAR],
+    //    meshes2
+    //)
+    //);
 
     this->models.push_back(new Model(
         glm::vec3(0.f, 0.f, 0.f),
         this->materials[0],
         this->textures[TEX_NANI],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/untitled.obj"
+        "C:/Users/ashju/Desktop/GADE7312_Level.obj"
     )
     );
 
@@ -170,14 +170,18 @@ void Game::initModels()
         delete i;
 }
 
-void Game::initPointLights()
-{
-    this->pointLights.push_back(new PointLight(glm::vec3(0.f)));
-}
-
 void Game::initLights()
 {
-    this->initPointLights();
+    //Directional Lighting
+    //this->dirLights.push_back(new DirLight(glm::vec3(1.f, 0.f, 0.f)));
+
+    //Point Lights
+    //this->pointLights.push_back(new PointLight(glm::vec3(1.f)));
+    //this->pointLights.push_back(new PointLight(glm::vec3(50.f, 0.f, -50.f)));
+    //this->pointLights.push_back(new PointLight(glm::vec3(50.f, 0.f, 50.f)));
+
+    //Spot Lights
+    this->spotLights.push_back(new SpotLight(glm::vec3(10.f)));
 }
 
 void Game::initUniforms()
@@ -187,8 +191,18 @@ void Game::initUniforms()
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(ViewMatrix, "ViewMatrix", false);
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(ProjectionMatrix, "ProjectionMatrix", false);
 
-    for(PointLight * pl : this->pointLights) {
-        pl->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+    for (DirLight* dl : this->dirLights) {
+        dl->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+    }
+
+    for (size_t i = 0; i < this->pointLights.size(); i++)
+    {
+        this->pointLights[i]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM], to_string(i));
+    }
+
+    for (size_t i = 0; i < this->spotLights.size(); i++)
+    {
+        this->spotLights[i]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM], to_string(i));
     }
 }
 
@@ -200,8 +214,18 @@ void Game::updateUniforms()
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "cameraPos");
 
-    for (PointLight* pl : this->pointLights) {
-        pl->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+    for (DirLight* dl : this->dirLights) {
+        dl->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+    }
+
+    for (size_t i = 0; i < this->pointLights.size(); i++)
+    {
+        this->pointLights[i]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM], to_string(i));
+    }
+
+    for (size_t i = 0; i < this->spotLights.size(); i++)
+    {
+        this->spotLights[i]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM], to_string(i));
     }
 
     //Update uniforms
@@ -210,7 +234,6 @@ void Game::updateUniforms()
 
     //Update frame buffer size and projection matrix
     glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
-
 
 
     //ProjectionMatrix = glm::mat4(1.f);
@@ -340,6 +363,9 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->mouseOffsetY = 0.0;
     this->firstMouse = true;
 
+    //FOR FPS COUNTER
+    lastFPSTime = glfwGetTime();
+    nbFrames = 0;
 
     this->initGLFW();
     this->initWindow(title, resizeable);
@@ -368,8 +394,8 @@ Game::~Game() {
     for (size_t i = 0; i < this->materials.size(); i++)
         delete this->materials[i];
 
-    //for (auto*& i : this->meshes)
-    //    delete i;
+    for (auto*& i : this->models)
+        delete i;
     
     for (size_t i = 0; i < this->pointLights.size(); i++)
         delete this->pointLights[i];
@@ -428,6 +454,17 @@ void Game::render()
     glUseProgram(0);
     glActiveTexture(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Game::fpsCounter() {
+    double currentTime = glfwGetTime();
+    nbFrames++;
+    if (currentTime - this->lastFPSTime >= 1.0) { // If last prinf() was more than 1 sec ago
+        // printf and reset timer
+        printf("%f ms/frame\n", 1000.0 / double(this->nbFrames));
+        this->nbFrames = 0;
+        this->lastFPSTime += 1.0;
+    }
 }
 
 
