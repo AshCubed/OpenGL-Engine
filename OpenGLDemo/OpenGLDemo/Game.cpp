@@ -87,25 +87,25 @@ void Game::initTextures()
 {
     //TEXTURE INIT
     //Texture 0
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/NANI.png", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/NANI_Specular.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/NANI.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/NANI_Specular.png", GL_TEXTURE_2D));
     //Texture 1
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/Shrek_MMH.png", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/Shrek_MMH_Specular.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/Shrek_MMH.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/Shrek_MMH_Specular.png", GL_TEXTURE_2D));
     //Texture _DOOR
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/Door.jpg", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/door_tex.jpg", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/door_tex2.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/Door.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/door_tex.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/door_tex2.jpg", GL_TEXTURE_2D));
     //Tex_Wall
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/wooden_wall.jpg", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/paintedWall_Wall.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/wooden_wall.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/paintedWall_Wall.jpg", GL_TEXTURE_2D));
     //Tex_Ceiling
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/ceiling_texture.jpg", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/tiled_ceiling.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/ceiling_texture.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/tiled_ceiling.jpg", GL_TEXTURE_2D));
     //Tex_Floor
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/stone_floor.png", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/brick_floor.jpg", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/grass_floor.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/stone_floor.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/brick_floor.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/grass_floor.jpg", GL_TEXTURE_2D));
 }
 
 void Game::initMaterials()
@@ -117,9 +117,9 @@ void Game::initMaterials()
 
 
 //Level file reading
-void Game::initReadLevelCols()
+int Game::initReadLevelCols(string fileName)
 {
-    std::ifstream file("C:/Users/ashju/Desktop/FileToRead.csv");
+    std::ifstream file("CSVFile/FileToRead.csv");
     std::string line = "";
     this->col = 0;
     this->row = 0;
@@ -143,15 +143,15 @@ void Game::initReadLevelCols()
         }
         this->row = this->row + 1;
     }
+    return col;
 }
 
 void Game::initReadLevelFile()
 {
-    initReadLevelCols();
+    this->col = initReadLevelCols("CSVFile/FileToRead.csv");
     std::stringstream ss;
-    std::ifstream in_file("C:/Users/ashju/Desktop/FileToRead.csv");
+    std::ifstream in_file("CSVFile/FileToRead.csv");
     std::string line = "";
-    std::string prefix = "";
 
     int objType = 0;
     int texNum = 0;
@@ -230,7 +230,7 @@ void Game::ObjType(int objType, int texNum, int posX, int posY, int posZ) {
             this->materials[0],
             this->textures[ObjTex(texNum)],
             this->textures[TEX_NANI_SPECULAR],
-            "C:/Users/ashju/Desktop/GADE7312_WALLS.obj",
+            "Models/GADE7312_WALLS.obj",
             glm::vec3(0.f, 90.f, 0.f)
         )
         );
@@ -242,7 +242,7 @@ void Game::ObjType(int objType, int texNum, int posX, int posY, int posZ) {
             this->materials[0],
             this->textures[ObjTex(texNum)],
             this->textures[TEX_NANI_SPECULAR],
-            "C:/Users/ashju/Desktop/GADE7312_FLOOR.obj",
+            "Models/GADE7312_FLOOR.obj",
             glm::vec3(0.f, 90.f, 0.f)
         )
         );
@@ -254,7 +254,7 @@ void Game::ObjType(int objType, int texNum, int posX, int posY, int posZ) {
             this->materials[0],
             this->textures[ObjTex(texNum)],
             this->textures[TEX_NANI_SPECULAR],
-            "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+            "Models/GADE7312_Door.obj",
             glm::vec3(0.f, 90.f, 0.f)
         )
         );
@@ -270,7 +270,7 @@ void Game::ObjType(int objType, int texNum, int posX, int posY, int posZ) {
         break;
     case 6:
         this->pointLights.push_back(new PointLight(glm::vec3(posX, posY, posZ)));
-        std::cout << "Lght Point" << "\n";
+        std::cout << "Light Point" << "\n";
         break;
     }
 }
@@ -397,7 +397,7 @@ void Game::initModels()
         this->materials[0],
         this->textures[TEX_PAINTWALL],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_WALLS.obj",
+        "Models/GADE7312_WALLS.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
@@ -408,7 +408,7 @@ void Game::initModels()
         this->materials[0],
         this->textures[TEX_STONEFLOOR],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_FLOOR.obj",
+        "Models/GADE7312_FLOOR.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
@@ -419,7 +419,7 @@ void Game::initModels()
         this->materials[0],
         this->textures[TEX_CEILING],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_FLOOR.obj",
+        "Models/GADE7312_FLOOR.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
@@ -431,7 +431,7 @@ void Game::initModels()
         this->materials[0],
         this->textures[TEX_DOOR],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+        "Models/GADE7312_Door.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
@@ -441,7 +441,7 @@ void Game::initModels()
         this->materials[0],
         this->textures[TEX_DOOR2],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+        "Models/GADE7312_Door.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
@@ -451,7 +451,7 @@ void Game::initModels()
         this->materials[0],
         this->textures[TEX_DOOR3],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+        "Models/GADE7312_Door.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
@@ -668,7 +668,6 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->initShaders();
     this->initTextures();
     this->initMaterials();
-    this->initReadLevelCols();
     this->initReadLevelFile();
     //this->initModels();
     //this->initLights();

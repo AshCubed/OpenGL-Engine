@@ -94,7 +94,7 @@ private:
 	void initMaterials();
 
 	//Level file reading
-	void initReadLevelCols();
+	int initReadLevelCols(string fileName);
 	void initReadLevelFile();
 	void ObjType(int objType, int texNum, int posX, int posY, int posZ);
 	texture_enum ObjTex(int num);
