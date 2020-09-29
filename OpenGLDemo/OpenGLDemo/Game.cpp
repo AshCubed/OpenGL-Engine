@@ -92,7 +92,20 @@ void Game::initTextures()
     //Texture 1
     this->textures.push_back(new Texture("C:/Users/ashju/Desktop/Shrek_MMH.png", GL_TEXTURE_2D));
     this->textures.push_back(new Texture("C:/Users/ashju/Desktop/Shrek_MMH_Specular.png", GL_TEXTURE_2D));
-
+    //Texture _DOOR
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/Door.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/door_tex.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/door_tex2.jpg", GL_TEXTURE_2D));
+    //Tex_Wall
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/wooden_wall.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/paintedWall_Wall.jpg", GL_TEXTURE_2D));
+    //Tex_Ceiling
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/ceiling_texture.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/tiled_ceiling.jpg", GL_TEXTURE_2D));
+    //Tex_Floor
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/stone_floor.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/brick_floor.jpg", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("C:/Users/ashju/Desktop/grass_floor.jpg", GL_TEXTURE_2D));
 }
 
 void Game::initMaterials()
@@ -101,6 +114,200 @@ void Game::initMaterials()
     this->materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
         0, 1));
 }
+
+
+//Level file reading
+void Game::initReadLevelCols()
+{
+    std::ifstream file("C:/Users/ashju/Desktop/FileToRead.csv");
+    std::string line = "";
+    this->col = 0;
+    this->row = 0;
+    int a = 0, b = 0;
+
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string result;
+        while (std::getline(iss, result, ';'))
+        {
+            if (col >= 8)
+            {
+                break;
+            }
+            else
+            {
+                this->col = this->col + 1;
+            }
+
+        }
+        this->row = this->row + 1;
+    }
+}
+
+void Game::initReadLevelFile()
+{
+    initReadLevelCols();
+    std::stringstream ss;
+    std::ifstream in_file("C:/Users/ashju/Desktop/FileToRead.csv");
+    std::string line = "";
+    std::string prefix = "";
+
+    int objType = 0;
+    int texNum = 0;
+    int posX = 0;
+    int posY = 0;
+    int posZ = 0;
+    int rotX = 0;
+    int rotY = 0;
+    int rotZ = 0;
+
+    int counter = 0;
+    while (std::getline(in_file, line, ';'))
+    {
+        counter++;
+        ss.clear();
+        ss.str(line);
+
+        if (counter >= col + 1)
+        {
+            cout << objType << " ";
+            cout << texNum << " ";
+            cout << posX << " ";
+            cout << posY << " ";
+            cout << posZ << " ";
+            cout << rotX << " ";
+            cout << rotY << " ";
+            cout << rotZ << "\n";
+
+            this->ObjType(objType, texNum, posX, posY, posZ);
+
+            objType = 0;
+            texNum = 0;
+            posX = 0;
+            posY = 0;
+            posZ = 0;
+            rotX = 0;
+            rotY = 0;
+            rotZ = 0;
+
+            counter = 0;
+            counter++;
+        }
+        if (counter == 1)
+        {
+            ss >> objType;
+        }
+        else if (counter == 2) {
+            ss >> texNum;
+        }
+        else if (counter == 3) {
+            ss >> posX;
+        }
+        else if (counter == 4) {
+            ss >> posY;
+        }
+        else if (counter == 5) {
+            ss >> posZ;
+        }
+        else if (counter == 6) {
+            ss >> rotX;
+        }
+        else if (counter == 7) {
+            ss >> rotY;
+        }
+        else if (counter == 8) {
+            ss >> rotZ;
+        }
+    }
+}
+
+void Game::ObjType(int objType, int texNum, int posX, int posY, int posZ) {
+    switch (objType) {
+    case 1:
+        this->models.push_back(new Model(
+            glm::vec3(posX, posY, posZ),
+            this->materials[0],
+            this->textures[ObjTex(texNum)],
+            this->textures[TEX_NANI_SPECULAR],
+            "C:/Users/ashju/Desktop/GADE7312_WALLS.obj",
+            glm::vec3(0.f, 90.f, 0.f)
+        )
+        );
+        std::cout << "Model Created: walls" << "\n";
+        break;
+    case 2:
+        this->models.push_back(new Model(
+            glm::vec3(posX, posY, posZ),
+            this->materials[0],
+            this->textures[ObjTex(texNum)],
+            this->textures[TEX_NANI_SPECULAR],
+            "C:/Users/ashju/Desktop/GADE7312_FLOOR.obj",
+            glm::vec3(0.f, 90.f, 0.f)
+        )
+        );
+        std::cout << "Model Created: Floor" << "\n";
+        break;
+    case 3:
+        this->models.push_back(new Model(
+            glm::vec3(posX, posY, posZ),
+            this->materials[0],
+            this->textures[ObjTex(texNum)],
+            this->textures[TEX_NANI_SPECULAR],
+            "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+            glm::vec3(0.f, 90.f, 0.f)
+        )
+        );
+        std::cout << "Model Created: Door" << "\n";
+        break;
+    case 4:
+        this->spotLights.push_back(new SpotLight(glm::vec3(posX, posY, posZ), glm::vec3(0.f, 90.f, 0.f)));
+        std::cout << "Light Spot" << "\n";
+        break;
+    case 5:
+        this->dirLights.push_back(new DirLight(glm::vec3(posX, posY, posZ), glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)));
+        std::cout << "Light Dir" << "\n";
+        break;
+    case 6:
+        this->pointLights.push_back(new PointLight(glm::vec3(posX, posY, posZ)));
+        std::cout << "Lght Point" << "\n";
+        break;
+    }
+}
+
+texture_enum Game::ObjTex(int num) {
+    switch (num) {
+    case 1:
+        return TEX_NANI;
+    case 2:
+        return TEX_NANI_SPECULAR;
+    case 3:
+        return TEX_SHREK;
+    case 4:
+        return TEX_SHREK_SPECULAR;
+    case 5:
+        return TEX_DOOR;
+    case 6:
+        return TEX_DOOR2;
+    case 7:
+        return TEX_DOOR3;
+    case 8:
+        return TEX_WALL;
+    case 9:
+        return TEX_PAINTWALL;
+    case 10:
+        return TEX_CEILING;
+    case 11:
+        return TEX_TILEDCEILING;
+    case 12:
+        return TEX_STONEFLOOR;
+    case 13:
+        return TEX_BRICKFLOOR;
+    case 14:
+        return TEX_GRASSFLOOR;
+    }
+}
+
 
 void Game::initModels()
 {
@@ -154,14 +361,101 @@ void Game::initModels()
     //)
     //);
 
+#pragma region Pyramids
+    meshes.push_back(
+        new Mesh(
+            &Pyramid(),
+            glm::vec3(0.f, 0.f, 0.f),
+            glm::vec3(0.f),
+            glm::vec3(0.f),
+            glm::vec3(2.f)
+        )
+    );
+
     this->models.push_back(new Model(
-        glm::vec3(0.f, 0.f, 0.f),
+        glm::vec3(-10.f, 0.f, -10.f),
+        this->materials[0],
+        this->textures[TEX_SHREK],
+        this->textures[TEX_SHREK_SPECULAR],
+        meshes
+    )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(10.f, 0.f, -10.f),
         this->materials[0],
         this->textures[TEX_NANI],
         this->textures[TEX_NANI_SPECULAR],
-        "C:/Users/ashju/Desktop/GADE7312_Level.obj"
+        meshes
     )
     );
+#pragma endregion
+
+#pragma region LEVEL MODELS
+    this->models.push_back(new Model(
+        glm::vec3(0.f, 1.f, 10.f),
+        this->materials[0],
+        this->textures[TEX_PAINTWALL],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/GADE7312_WALLS.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
+
+    //Floor
+    this->models.push_back(new Model(
+        glm::vec3(0.f, 1.f, 10.f),
+        this->materials[0],
+        this->textures[TEX_STONEFLOOR],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/GADE7312_FLOOR.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
+
+    //Roof
+    this->models.push_back(new Model(
+        glm::vec3(0.f, 14.f, 10.f),
+        this->materials[0],
+        this->textures[TEX_CEILING],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/GADE7312_FLOOR.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
+#pragma endregion
+
+#pragma region DOOR MODELS
+    this->models.push_back(new Model(
+        glm::vec3(4.f, 0.f, 82.f),
+        this->materials[0],
+        this->textures[TEX_DOOR],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(-36.f, 0.f, 51.f),
+        this->materials[0],
+        this->textures[TEX_DOOR2],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
+
+    this->models.push_back(new Model(
+        glm::vec3(44.f, 0.f, 51.f),
+        this->materials[0],
+        this->textures[TEX_DOOR3],
+        this->textures[TEX_NANI_SPECULAR],
+        "C:/Users/ashju/Desktop/GADE7312_Door.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
+#pragma endregion
 
     for (auto*& i : meshes)
         delete i;
@@ -173,15 +467,14 @@ void Game::initModels()
 void Game::initLights()
 {
     //Directional Lighting
-    //this->dirLights.push_back(new DirLight(glm::vec3(1.f, 0.f, 0.f)));
+    this->dirLights.push_back(new DirLight(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)));
 
     //Point Lights
     //this->pointLights.push_back(new PointLight(glm::vec3(1.f)));
     //this->pointLights.push_back(new PointLight(glm::vec3(50.f, 0.f, -50.f)));
-    //this->pointLights.push_back(new PointLight(glm::vec3(50.f, 0.f, 50.f)));
 
     //Spot Lights
-    this->spotLights.push_back(new SpotLight(glm::vec3(10.f)));
+    //this->spotLights.push_back(new SpotLight(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 90.f, 0.f)));
 }
 
 void Game::initUniforms()
@@ -270,14 +563,14 @@ void Game::updateKeyboardInputs()
     {
         this->camera.move(this->dt, RIGHT);
     }
-    if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
-    {
-        this->camPosition.y += 0.005f;
-    }
-    if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
-    {
-        this->camPosition.y -= 0.005f;
-    }
+    //if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
+    //{
+    //    this->camPosition.y += 0.005f;
+    //}
+    //if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
+    //{
+    //    this->camPosition.y -= 0.005f;
+    //}
 }
 
 void Game::updateDT()
@@ -322,7 +615,6 @@ void Game::updateInput()
 
     this->camera.updateInput(dt, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
-
 
 
 //Constructors / Destructors
@@ -376,8 +668,10 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->initShaders();
     this->initTextures();
     this->initMaterials();
-    this->initModels();
-    this->initLights();
+    this->initReadLevelCols();
+    this->initReadLevelFile();
+    //this->initModels();
+    //this->initLights();
     this->initUniforms();
 }
 
@@ -422,8 +716,8 @@ void Game::update()
     this->updateInput();
     this->updateDT();
 
-    /*this->models[0]->rotate(glm::vec3(0.f, 0.01f, 0.f));
-    this->models[1]->rotate(glm::vec3(0.f, 0.01f, 0.f));*/
+   /* this->models[0]->updateRotation(glm::vec3(0.f, 0.01f, 0.f));
+    this->models[1]->updateRotation(glm::vec3(0.f, 0.01f, 0.f));*/
 }
 
 void Game::render()
@@ -433,7 +727,7 @@ void Game::render()
 
     //DRAW ---
     //Clear
-    //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     //Update the game uniforms

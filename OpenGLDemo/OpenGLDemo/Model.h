@@ -2,7 +2,6 @@
 
 #include "Mesh.h"
 #include "Texture.h"
-#include "Shader.h"
 #include "Material.h"
 #include "OBJLoader.h"
 
@@ -14,6 +13,7 @@ private:
 
 	std::vector<Mesh*> meshes;
 	glm::vec3 position;
+	glm::vec3 rotation;
 
 	void updateUniforms() {
 
@@ -26,9 +26,11 @@ public:
 		Material* material, 
 		Texture* overrideTexDif, 
 		Texture* overrideTexSpec,
-		std::vector<Mesh*> meshes) 
+		std::vector<Mesh*> meshes,
+		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f))
 	{
 		this->position = position;
+		this->rotation = rotation;
 		this->material = material;
 		this->overrideTextureDiffuse = overrideTexDif;
 		this->overrideTextureSpecular = overrideTexSpec;
@@ -37,10 +39,8 @@ public:
 			this->meshes.push_back(new Mesh(*i));
 		}
 
-		for (auto& i : this->meshes) {
-			i->move(this->position);
-			i->setOrigin(this->position);
-		}
+		this->updateMovement(this->position);
+		this->updateRotation(this->rotation);
 
 	}
 
@@ -50,9 +50,11 @@ public:
 		Material* material,
 		Texture* overrideTexDif,
 		Texture* overrideTexSpec,
-		const char* obj_file)
+		const char* obj_file,
+		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f))
 	{
 		this->position = position;
+		this->rotation = rotation;
 		this->material = material;
 		this->overrideTextureDiffuse = overrideTexDif;
 		this->overrideTextureSpecular = overrideTexSpec;
@@ -63,12 +65,8 @@ public:
 			glm::vec3(0.f),
 			glm::vec3(1.f)));
 
-		for (auto& i : this->meshes)
-		{
-			i->move(this->position);
-			i->setOrigin(this->position);
-		}
-
+		this->updateMovement(this->position);
+		this->updateRotation(this->rotation);
 	}
 
 	~Model() {
@@ -78,14 +76,17 @@ public:
 	}
 
 	//Functions
-	void rotate(const glm::vec3 rotation) {
+	void updateRotation(const glm::vec3 rotation) {
 		for (auto& i : this->meshes) {
 			i->rotate(rotation);
 		}
 	}
 
-	void update() {
-
+	void updateMovement(glm::vec3 newPosition) {
+		for (auto& i : this->meshes) {
+			i->move(newPosition);
+			i->setOrigin(newPosition);
+		}
 	}
 
 	void render(Shader* shader) {

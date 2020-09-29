@@ -21,13 +21,13 @@
 
 #include<SOIL2.h>
 
-#include "Shader.h"
+#include "Model.h"
+#include "Mesh.h"
+#include "Primitives.h"
 #include "Texture.h"
 #include "Material.h"
+#include "Shader.h"
 #include "Vertex.h"
-#include "Primitives.h"
-#include "Mesh.h"
-#include "Model.h"
 #include "Light.h"
 
 

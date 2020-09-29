@@ -6,10 +6,19 @@ protected:
 	float intensity;
 	glm::vec3 color;
 
+	glm::vec3 ambient;
+	glm::vec3 diffues;
+	glm::vec3 specular;
+
 public:
-	Light(float intensity, glm::vec3 color) {
+	Light(float intensity, glm::vec3 color, glm::vec3 ambient = glm::vec3(0.1f), glm::vec3 diffues = glm::vec3(0.8f),
+	glm::vec3 specular = glm::vec3(1.f)) 
+	{
 		this->intensity = intensity;
 		this->color = color;
+		this->ambient = ambient;
+		this->diffues = diffues;
+		this->specular = specular;
 	}
 
 	~Light() {
@@ -25,9 +34,9 @@ protected:
 	glm::vec3 direction;
 
 public:
-	DirLight(glm::vec3 direction,
-		float intensity = 1.f, glm::vec3 color = glm::vec3(1.f))
-		: Light(intensity, color)
+	DirLight(glm::vec3 direction, glm::vec3 ambient = glm::vec3(0.1f), glm::vec3 diffues = glm::vec3(0.8f),
+		glm::vec3 specular = glm::vec3(1.f), float intensity = 1.f, glm::vec3 color = glm::vec3(1.f))
+		: Light(intensity, color, ambient, diffues, specular)
 	{
 		this->direction = direction;
 	}
@@ -44,6 +53,10 @@ public:
 		programID.setVec3f(this->direction, "dirLight.direction");
 		programID.setVec1f(this->intensity, "dirLight.intensity");
 		programID.setVec3f(this->color, "dirLight.color");
+
+		programID.setVec3f(this->color, "dirLight.ambient");
+		programID.setVec3f(this->color, "dirLight.diffues");
+		programID.setVec3f(this->color, "dirLight.specular");
 	}
 
 };
@@ -58,9 +71,10 @@ protected:
 
 
 public:
-	PointLight(glm::vec3 position, float intensity = 1.f, glm::vec3 color = glm::vec3(1.f),
+	PointLight(glm::vec3 position, float intensity = 1.f, glm::vec3 color = glm::vec3(1.f), 
+		glm::vec3 ambient = glm::vec3(0.1f), glm::vec3 diffues = glm::vec3(0.8f), glm::vec3 specular = glm::vec3(1.f),
 		float constant = 1.f, float linear = 0.045f, float quadratic = 0.00075f)
-		: Light(intensity, color)
+		: Light(intensity, color, ambient, diffues, specular)
 	{
 		this->position = position;
 		this->constant = constant;
@@ -107,12 +121,29 @@ public:
 		quadratic += "].quadratic";
 		const GLchar* quadratic2 = quadratic.c_str();
 
+		string ambient = "pointLight[";
+		ambient += i;
+		ambient += "].ambient";
+		const GLchar* ambient2 = ambient.c_str();
+
+		string diffues = "pointLight[";
+		diffues += i;
+		diffues += "].diffues";
+		const GLchar* diffues2 = diffues.c_str();
+
+		string specular = "pointLight[";
+		specular += i;
+		specular += "].specular";
+		const GLchar* specular2 = specular.c_str();
+
 		programID.setVec3f(this->position, pos2);
 		programID.setVec1f(this->intensity, intensity2);
 		programID.setVec3f(this->color, color2);
 		programID.setVec1f(this->constant, constant2);
 		programID.setVec1f(this->linear, linear2);
 		programID.setVec1f(this->quadratic, quadratic2);
+		programID.setVec3f(this->ambient, ambient2);
+		programID.setVec3f(this->specular, specular2);
 	}
 };
 
@@ -125,8 +156,9 @@ protected:
 
 public:
 	SpotLight(glm::vec3 position, glm::vec3 direction = glm::vec3(1.f), float cutOff = glm::cos(glm::radians(12.5f)), 
-		float outerCutOff = glm::cos(glm::radians(17.5f)), float intensity = 4.f, glm::vec3 color = glm::vec3(1.f))
-		: Light(intensity, color)
+		float outerCutOff = glm::cos(glm::radians(17.5f)), float intensity = 4.f, glm::vec3 color = glm::vec3(1.f),
+		glm::vec3 ambient = glm::vec3(0.1f), glm::vec3 diffues = glm::vec3(0.8f), glm::vec3 specular = glm::vec3(1.f))
+		: Light(intensity, color, ambient, diffues, specular)
 	{
 		this->position = position;
 		this->direction = direction;
@@ -163,10 +195,15 @@ public:
 		outerCutOff += "].outerCutOff";
 		const GLchar* outerCutOff2 = outerCutOff.c_str();
 
+		string ambient = "spotLights[";
+		ambient += i;
+		ambient += "].ambient";
+		const GLchar* ambient2 = ambient.c_str();
+
 		programID.setVec3f(this->position, pos2);
 		programID.setVec3f(this->direction, direction2);
 		programID.setVec1f(this->cutOff, cutOff2);
 		programID.setVec1f(this->outerCutOff, outerCutOff2);
+		programID.setVec3f(this->ambient, ambient2);
 	}
-
 };

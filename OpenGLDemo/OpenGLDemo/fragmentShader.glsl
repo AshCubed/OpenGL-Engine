@@ -12,6 +12,10 @@ struct DirLight {
     vec3 direction;
     vec3 color;
     float intensity;
+
+    vec3 ambient;
+    vec3 diffues;
+    vec3 specular;
 };
 
 struct PointLight{
@@ -21,6 +25,10 @@ struct PointLight{
     float constant;
     float linear;
     float quadratic;
+
+    vec3 ambient;
+    vec3 diffues;
+    vec3 specular;
 };
 
 struct SpotLight{
@@ -28,6 +36,8 @@ struct SpotLight{
     vec3  direction;
     float cutOff;
     float outerCutOff;
+
+    vec3 ambient;
 };
 
 in vec3 vs_position;
@@ -59,13 +69,6 @@ vec3 calculateDiffuse(Material material, vec3 vs_position, vec3 vs_normal, vec3 
     return diffuseFinal;
 }
 
-vec3 calculateDIRDiffuse(Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0){
-    vec3 posToLightDirVec = normalize(-lightPos0);
-    float diffuseConst = clamp(dot(posToLightDirVec, normalize(vs_normal)), 0, 1);
-    vec3 diffuseFinal = material.diffues * diffuseConst;
-    return diffuseFinal;
-}
-
 vec3 calculateSpecular(Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0, vec3 cameraPos){
     vec3 lightToPosDirVec = normalize(vs_position- lightPos0);
     vec3 reflectDirVec = normalize(reflect(lightToPosDirVec, normalize(vs_normal)));
@@ -77,17 +80,25 @@ vec3 calculateSpecular(Material material, vec3 vs_position, vec3 vs_normal, vec3
     return specularFinal;
 }
 
+vec3 calculateDirectional(Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0, vec3 cameraPos){
+    vec3 lightToPosDirVec = normalize(-lightPos0);
+    float diff = max(dot(vs_normal, lightPos0), 0.0);
+    vec3 reflectDirVec = (reflect(lightToPosDirVec, normalize(vs_normal)));
+    float specularConst = pow(max(dot(vs_position, reflectDirVec), 0), 35);
+
+    vec3 ambient  = dirLight.ambient  * texture(material.diffuseTex, vs_texcoord).rgb;
+    vec3 diffuse  = dirLight.diffues  * diff * texture(material.diffuseTex, vs_texcoord).rgb;
+    vec3 specular = dirLight.specular * specularConst * texture(material.specularTex, vs_texcoord).rgb;
+    
+    return (vec4(ambient, 1.f)) + vec4(diffuse, 1.f) + vec4(specular, 1.f);
+}
+
 void main()
 {
     vec4 temp;
     
     //Directional Light
-    vec3 directionalAmbientFinal = calculateAmbient(material);
-    vec3 directionalDiffuseFinal = calculateDIRDiffuse(material, vs_position, vs_normal, dirLight.direction);
-    vec3 directionalSpecularFinal = calculateSpecular(material, vs_position, vs_normal, dirLight.direction, cameraPos);
-    temp += (vec4(directionalAmbientFinal, 1.f)) + vec4(directionalDiffuseFinal, 1.f) 
-        + vec4(directionalSpecularFinal, 1.f);
-
+    temp += calculateDirectional(material, vs_position, vs_normal, dirLight.direction, cameraPos);
 
     //All Point Lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++){
@@ -120,25 +131,37 @@ void main()
 
     //All Spot Lights
     for(int i = 0; i < NR_SPOTPOINT_LIGHTS; i++){
-        vec3 lightDir = normalize(spotLights[i].position - vs_position);
-        float theta = dot(lightDir, normalize(-spotLights[i].direction));
+        vec4 finalSpot;
+
+        float theta = 1.0f + dot(cameraPos, normalize(-spotLights[i].direction)); 
         float epsilon = (spotLights[i].cutOff - spotLights[i].outerCutOff);
-        float intensity = clamp((theta - spotLights[i].outerCutOff) / epsilon, 0.0, 1.0);
+        float intensity = clamp((theta - spotLights[i].outerCutOff) / epsilon, 0.0, 500.f);
 
-        vec3 spotLightDiffuseFinal;
-        spotLightDiffuseFinal *= intensity;
-        vec3 spotLightSpecularFinal;
-        spotLightSpecularFinal *= intensity;
+        vec3 ambientFinal = material.ambient;
 
-        temp += vec4(spotLightDiffuseFinal, 1.f) + vec4(spotLightSpecularFinal, 1.f);
+        vec3 posToLightDir = normalize(spotLights[i].position - vs_position);
+        float diffuse = clamp(dot(posToLightDir, vs_normal), 0, 1);
+        vec3 diffuseFinal = material.diffues * diffuse;
+
+        vec3 lightToPosDir = normalize(vs_position - spotLights[i].position);
+        vec3 reflectDirVec = normalize(reflect(lightToPosDir, normalize(vs_normal)));
+        vec3 posToViewDirVec = normalize(vs_position - cameraPos);
+        float specularConstant = pow(max(dot(posToViewDirVec, reflectDirVec), 0), 30);
+        vec3 specularFinal = material.specular * specularConstant * texture(material.specularTex, vs_texcoord).rgb;
+
+
+        diffuseFinal  *= intensity;
+        specularFinal *= intensity;
+
+        finalSpot = (vec4(specularFinal, 1.f) * vec4(diffuseFinal, 1.f) * vec4(ambientFinal, 1.f));
+
+        temp += finalSpot;
     }
-
 
         fs_color = texture(material.diffuseTex, vs_texcoord) * 
         (temp);
 
-        fs_color =  
-        (temp);
+        //fs_color =  
+        //(temp);
 
-    
 }

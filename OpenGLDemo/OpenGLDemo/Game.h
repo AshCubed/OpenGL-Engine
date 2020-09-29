@@ -7,7 +7,9 @@ enum shader_enums {
 	SHADER_CORE_PROGRAM = 0
 };
 enum texture_enum {
-	TEX_NANI = 0, TEX_NANI_SPECULAR, TEX_SHREK_MMH1, TEX_SHREK_SPECULAR
+	TEX_NANI = 0, TEX_NANI_SPECULAR, TEX_SHREK, TEX_SHREK_SPECULAR, 
+	TEX_DOOR,TEX_DOOR2, TEX_DOOR3, TEX_WALL, TEX_PAINTWALL, TEX_CEILING, TEX_TILEDCEILING, TEX_STONEFLOOR,
+	TEX_BRICKFLOOR, TEX_GRASSFLOOR
 };
 enum material_enum {
 	MAT_1 = 0
@@ -77,6 +79,10 @@ private:
 	double lastFPSTime;
 	int nbFrames;
 
+	//for file reading
+	int col;
+	int row;
+
 //Private Functions
 	void initGLFW();
 	void initWindow(const char* title, bool resizeable);
@@ -86,12 +92,18 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
+
+	//Level file reading
+	void initReadLevelCols();
+	void initReadLevelFile();
+	void ObjType(int objType, int texNum, int posX, int posY, int posZ);
+	texture_enum ObjTex(int num);
+
 	void initModels();
 	void initLights();
 	void initUniforms();
 
 	void updateUniforms();
-
 	//Inputs
 	void updateKeyboardInputs();
 	void updateDT();
