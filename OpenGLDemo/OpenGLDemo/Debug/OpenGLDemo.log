@@ -1,10 +1,6 @@
 ﻿  Game.cpp
 D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Model.h(39,1): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
 D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Model.h(66,1): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(373,5): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
-  OpenGLDemo.cpp
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Model.h(39,1): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Model.h(66,1): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
-  Generating Code...
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(309): warning C4715: 'Game::ObjTex': not all control paths return a value
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(374,5): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(310): warning C4715: 'Game::ObjTex': not all control paths return a value
   OpenGLDemo.vcxproj -> D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\Debug\OpenGLDemo.exe
