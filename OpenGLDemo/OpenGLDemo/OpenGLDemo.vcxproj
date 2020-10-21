@@ -144,15 +144,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Assimp.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="OpenGLDemo.cpp" />
+    <ClCompile Include="ShadowMapFBO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.glsl" />
     <None Include="vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Assimp.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="libs.h" />
@@ -163,6 +166,7 @@
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="Primitives.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShadowMapFBO.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>

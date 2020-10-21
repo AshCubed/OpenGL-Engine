@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Material.h"
 #include "OBJLoader.h"
+#include "Assimp.h"
 
 class Model {
 private:
@@ -50,7 +51,7 @@ public:
 		Material* material,
 		Texture* overrideTexDif,
 		Texture* overrideTexSpec,
-		const char* obj_file,
+		string obj_file,
 		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f))
 	{
 		this->position = position;
@@ -59,8 +60,11 @@ public:
 		this->overrideTextureDiffuse = overrideTexDif;
 		this->overrideTextureSpecular = overrideTexSpec;
 
-		std::vector<Vertex> mesh = loadOBJ(obj_file);
-		this->meshes.push_back(new Mesh(mesh.data(), mesh.size(), NULL, 0, glm::vec3(1.f, 0.f, 0.f),
+		ModelManager model = ModelManager();
+		model.loadModel(obj_file);
+		std::vector<Vertex> temp = *model.getVertexData();
+
+		this->meshes.push_back(new Mesh(temp.data(), temp.size(), NULL, 0, glm::vec3(1.f, 0.f, 0.f),
 			glm::vec3(0.f),
 			glm::vec3(0.f),
 			glm::vec3(1.f)));
@@ -68,6 +72,8 @@ public:
 		this->updateMovement(this->position);
 		this->updateRotation(this->rotation);
 	}
+
+
 
 	~Model() {
 		for (auto*& i : meshes) {

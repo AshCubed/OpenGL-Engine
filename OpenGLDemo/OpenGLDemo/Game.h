@@ -58,6 +58,9 @@ private:
 	float nearPlane;
 	float farPlane;
 
+	unsigned int depthMapFBO;
+	glm::mat4 LightSpaceMatrix;
+
 	//Shaders
 	std::vector<Shader*> shaders;
 
@@ -76,8 +79,8 @@ private:
 	std::vector<SpotLight*> spotLights;
 
 	//FOR FPS COUNTER
-	double lastFPSTime;
-	int nbFrames;
+	int frameCount, previousTime;
+	boolean wantFPS;
 
 	//for file reading
 	int col;
@@ -110,6 +113,8 @@ private:
 	void updateMouseInputs();
 	void updateInput();
 
+	void fpsCounter();
+
 
 //Static Variables
 
@@ -131,7 +136,7 @@ public:
 //Functions
 	void update();
 	void render();
-	void fpsCounter();
+	void userCommands();
 
 
 //Static Functions

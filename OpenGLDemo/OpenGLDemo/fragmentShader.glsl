@@ -57,6 +57,8 @@ uniform DirLight dirLight;
 uniform vec3 lightPos0;
 uniform vec3 cameraPos;
 
+uniform sampler2D gShadowMap;
+
 //Functions
 vec3 calculateAmbient(Material material){
     return material.ambient;
@@ -90,6 +92,7 @@ vec3 calculateDirectional(Material material, vec3 vs_position, vec3 vs_normal, v
     vec3 diffuse  = dirLight.diffues  * diff * texture(material.diffuseTex, vs_texcoord).rgb;
     vec3 specular = dirLight.specular * specularConst * texture(material.specularTex, vs_texcoord).rgb;
     
+
     return (vec4(ambient, 1.f)) + vec4(diffuse, 1.f) + vec4(specular, 1.f);
 }
 
@@ -158,9 +161,13 @@ void main()
         temp += finalSpot;
     }
 
+        float Depth = texture(gShadowMap, vs_texcoord).x;
+        Depth = 1.0 - (1.0 - Depth) * 25.0;
+        
+
         fs_color = texture(material.diffuseTex, vs_texcoord) * 
         (temp);
-
+        
         //fs_color =  
         //(temp);
 

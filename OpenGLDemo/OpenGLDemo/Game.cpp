@@ -51,7 +51,7 @@ void Game::initOpenGLOptions()
 {
     glEnable(GL_DEPTH_TEST);
 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
@@ -406,23 +406,23 @@ void Game::initModels()
     this->models.push_back(new Model(
         glm::vec3(0.f, 1.f, 10.f),
         this->materials[0],
-        this->textures[TEX_STONEFLOOR],
+        this->textures[TEX_WALL],
         this->textures[TEX_NANI_SPECULAR],
         "Models/GADE7312_FLOOR.obj",
         glm::vec3(0.f, 90.f, 0.f)
     )
     );
 
-    //Roof
-    this->models.push_back(new Model(
-        glm::vec3(0.f, 14.f, 10.f),
-        this->materials[0],
-        this->textures[TEX_CEILING],
-        this->textures[TEX_NANI_SPECULAR],
-        "Models/GADE7312_FLOOR.obj",
-        glm::vec3(0.f, 90.f, 0.f)
-    )
-    );
+    ////Roof
+    //this->models.push_back(new Model(
+    //    glm::vec3(0.f, 14.f, 10.f),
+    //    this->materials[0],
+    //    this->textures[TEX_CEILING],
+    //    this->textures[TEX_NANI_SPECULAR],
+    //    "Models/GADE7312_FLOOR.obj",
+    //    glm::vec3(0.f, 90.f, 0.f)
+    //)
+    //);
 #pragma endregion
 
 #pragma region DOOR MODELS
@@ -456,6 +456,7 @@ void Game::initModels()
     )
     );
 #pragma endregion
+
 
     for (auto*& i : meshes)
         delete i;
@@ -521,10 +522,6 @@ void Game::updateUniforms()
         this->spotLights[i]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM], to_string(i));
     }
 
-    //Update uniforms
-    //this->shaders[SHADER_CORE_PROGRAM]->set1i(0, "texture0");
-    //this->shaders[SHADER_CORE_PROGRAM]->set1i(1, "texture1");
-
     //Update frame buffer size and projection matrix
     glfwGetFramebufferSize(this->window, &this->frameBufferWidth, &this->frameBufferHeight);
 
@@ -544,6 +541,7 @@ void Game::updateKeyboardInputs()
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(this->window, GLFW_TRUE);
+        cout << "\n=======     Engine Closed       =======\n";
     }
 
     //Camera
@@ -656,8 +654,9 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->firstMouse = true;
 
     //FOR FPS COUNTER
-    lastFPSTime = glfwGetTime();
-    nbFrames = 0;
+    this->previousTime = 0;
+    this->frameCount = 0;
+    wantFPS = false;
 
     this->initGLFW();
     this->initWindow(title, resizeable);
@@ -668,10 +667,12 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->initShaders();
     this->initTextures();
     this->initMaterials();
-    this->initReadLevelFile();
-    //this->initModels();
-    //this->initLights();
+    //this->initReadLevelFile();
+    this->initModels();
+    this->initLights();
     this->initUniforms();
+
+
 }
 
 Game::~Game() {
@@ -714,7 +715,10 @@ void Game::update()
     glfwPollEvents();
     this->updateInput();
     this->updateDT();
-
+    if (wantFPS)
+    {
+        this->fpsCounter();
+    }
    /* this->models[0]->updateRotation(glm::vec3(0.f, 0.01f, 0.f));
     this->models[1]->updateRotation(glm::vec3(0.f, 0.01f, 0.f));*/
 }
@@ -729,6 +733,7 @@ void Game::render()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+
     //Update the game uniforms
     this->updateUniforms();
 
@@ -736,11 +741,12 @@ void Game::render()
     for (auto& i : this->models) {
         i->render(this->shaders[SHADER_CORE_PROGRAM]);
     }
-   
 
     //End Draw
     glfwSwapBuffers(window);
     glFlush();
+
+
 
     //Security, backup to unbind
     glBindVertexArray(0);
@@ -751,12 +757,80 @@ void Game::render()
 
 void Game::fpsCounter() {
     double currentTime = glfwGetTime();
-    nbFrames++;
-    if (currentTime - this->lastFPSTime >= 1.0) { // If last prinf() was more than 1 sec ago
-        // printf and reset timer
-        printf("%f ms/frame\n", 1000.0 / double(this->nbFrames));
-        this->nbFrames = 0;
-        this->lastFPSTime += 1.0;
+    frameCount++;
+    // If a second has passed.
+    if (currentTime - previousTime >= 1.0)
+    {
+        // Display the frame count here any way you want.
+        printf("%f ms/frame\n", 1000.0 / double(this->frameCount));
+
+        frameCount = 0;
+        previousTime = currentTime;
+    }
+}
+
+void Game::userCommands()
+{
+    if (glfwGetKey(this->window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    {
+        string temp;
+        cout << "Enter a command:\n ";
+        cin >> temp;
+
+        if (temp == "help")
+        {
+            cout << "Possible Commands: fps, triangles, load level, spawn model \n";
+            return;
+        }
+        else if (temp == "fps") {
+            if (wantFPS == false)
+            {
+                wantFPS = true;
+                cout << "FPS counter Enabled \n";
+                return;
+            }
+            else {
+                wantFPS = false;
+                cout << "FPS counter Disabled \n";
+                return;
+            }
+        }
+        else if (temp == "triangles") {
+
+        }
+        else if (temp == "loadlevel") {
+
+        }
+        else if (temp == "spawnmodel") {
+            string fileName;
+            float xPos, yPos, zPos;
+            float xRot, yRot, zRot;
+            cout << "Please enter file Name, include file type extension in the name \n ";
+            cin >> fileName;
+            fileName = "Models/" + fileName;
+            cout << "Please enter X Position \n ";
+            cin >> xPos;
+            cout << "Please enter Y Position \n ";
+            cin >> yPos;
+            cout << "Please enter Z Position \n ";
+            cin >> zPos;
+
+            this->models.push_back(new Model(
+                glm::vec3(xPos, yPos, zPos),
+                this->materials[0],
+                this->textures[TEX_PAINTWALL],
+                this->textures[TEX_NANI_SPECULAR],
+                fileName,
+                glm::vec3(0.f, 90.f, 0.f)
+            )
+            );
+            cout << "Model Loaded \n ";
+            return;
+        }
+        else {
+            cout << "Incorrect Command, please return to game engine window and press enter to open command prompt\n ";
+            return;
+        }
     }
 }
 
