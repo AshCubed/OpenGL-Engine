@@ -1,4 +1,6 @@
 #include "Game.h"
+#include <stdlib.h>
+#include <string.h>
 
 //Private Functions
 void Game::initGLFW()
@@ -20,7 +22,7 @@ void Game::initWindow(const char* title, bool resizeable)
 
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); MAC OS
 
-    
+
     this->window = glfwCreateWindow(this->WINDOW_WIDTH, this->WINDOW_HEIGHT, title, NULL, NULL);
 
     if (this->window == nullptr)
@@ -72,15 +74,18 @@ void Game::initMatricies()
 
     this->ProjectionMatrix = glm::mat4(1.f);
     this->ProjectionMatrix = glm::perspective(glm::radians(this->fov),
-        static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight, 
+        static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight,
         this->nearPlane, this->farPlane);
 }
 
 void Game::initShaders()
 {
     this->shaders.push_back(
-        new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
-        "vertexShader.glsl", "fragmentShader.glsl"));
+        new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+            "vertexShader.glsl", "fragmentShader.glsl"));
+    this->shaders.push_back(
+        new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+            "debug_quadVS.glsl", "debug_quad_depthFS.glsl"));
 }
 
 void Game::initTextures()
@@ -88,10 +93,10 @@ void Game::initTextures()
     //TEXTURE INIT
     //Texture 0
     this->textures.push_back(new Texture("Textures/NANI.png", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("Textures/NANI_Specular.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/NANI_Specular.png", aiTextureType_SPECULAR));
     //Texture 1
     this->textures.push_back(new Texture("Textures/Shrek_MMH.png", GL_TEXTURE_2D));
-    this->textures.push_back(new Texture("Textures/Shrek_MMH_Specular.png", GL_TEXTURE_2D));
+    this->textures.push_back(new Texture("Textures/Shrek_MMH_Specular.png", aiTextureType_SPECULAR));
     //Texture _DOOR
     this->textures.push_back(new Texture("Textures/Door.jpg", GL_TEXTURE_2D));
     this->textures.push_back(new Texture("Textures/door_tex.jpg", GL_TEXTURE_2D));
@@ -112,7 +117,7 @@ void Game::initMaterials()
 {
     //MATERIAL 0
     this->materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
-        0, 1));
+        0, 1, 1, 1));
 }
 
 
@@ -148,13 +153,13 @@ int Game::initReadLevelCols(string fileName)
 
 void Game::initReadLevelFile()
 {
-    this->col = initReadLevelCols("CSVFile/FileToRead.csv");
+    this->col = initReadLevelCols(this->fileName);
     std::stringstream ss;
-    std::ifstream in_file("CSVFile/FileToRead.csv");
+    std::ifstream in_file(this->fileName);
     std::string line = "";
 
-    int objType = 0;
-    int texNum = 0;
+    string objType = "";
+    string texNum = " ";
     int posX = 0;
     int posY = 0;
     int posZ = 0;
@@ -182,8 +187,8 @@ void Game::initReadLevelFile()
 
             this->ObjType(objType, texNum, posX, posY, posZ);
 
-            objType = 0;
-            texNum = 0;
+            objType = "";
+            texNum;
             posX = 0;
             posY = 0;
             posZ = 0;
@@ -222,89 +227,41 @@ void Game::initReadLevelFile()
     }
 }
 
-void Game::ObjType(int objType, int texNum, int posX, int posY, int posZ) {
-    switch (objType) {
-    case 1:
-        this->models.push_back(new Model(
-            glm::vec3(posX, posY, posZ),
-            this->materials[0],
-            this->textures[ObjTex(texNum)],
-            this->textures[TEX_NANI_SPECULAR],
-            "Models/GADE7312_WALLS.obj",
-            glm::vec3(0.f, 90.f, 0.f)
-        )
-        );
-        std::cout << "Model Created: walls" << "\n";
-        break;
-    case 2:
-        this->models.push_back(new Model(
-            glm::vec3(posX, posY, posZ),
-            this->materials[0],
-            this->textures[ObjTex(texNum)],
-            this->textures[TEX_NANI_SPECULAR],
-            "Models/GADE7312_FLOOR.obj",
-            glm::vec3(0.f, 90.f, 0.f)
-        )
-        );
-        std::cout << "Model Created: Floor" << "\n";
-        break;
-    case 3:
-        this->models.push_back(new Model(
-            glm::vec3(posX, posY, posZ),
-            this->materials[0],
-            this->textures[ObjTex(texNum)],
-            this->textures[TEX_NANI_SPECULAR],
-            "Models/GADE7312_Door.obj",
-            glm::vec3(0.f, 90.f, 0.f)
-        )
-        );
-        std::cout << "Model Created: Door" << "\n";
-        break;
-    case 4:
-        this->spotLights.push_back(new SpotLight(glm::vec3(posX, posY, posZ), glm::vec3(0.f, 90.f, 0.f)));
-        std::cout << "Light Spot" << "\n";
-        break;
-    case 5:
-        this->dirLights.push_back(new DirLight(glm::vec3(posX, posY, posZ), glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)));
-        std::cout << "Light Dir" << "\n";
-        break;
-    case 6:
-        this->pointLights.push_back(new PointLight(glm::vec3(posX, posY, posZ)));
-        std::cout << "Light Point" << "\n";
-        break;
-    }
-}
+void Game::ObjType(string objType, string texNum, int posX, int posY, int posZ) {
 
-texture_enum Game::ObjTex(int num) {
-    switch (num) {
-    case 1:
-        return TEX_NANI;
-    case 2:
-        return TEX_NANI_SPECULAR;
-    case 3:
-        return TEX_SHREK;
-    case 4:
-        return TEX_SHREK_SPECULAR;
-    case 5:
-        return TEX_DOOR;
-    case 6:
-        return TEX_DOOR2;
-    case 7:
-        return TEX_DOOR3;
-    case 8:
-        return TEX_WALL;
-    case 9:
-        return TEX_PAINTWALL;
-    case 10:
-        return TEX_CEILING;
-    case 11:
-        return TEX_TILEDCEILING;
-    case 12:
-        return TEX_STONEFLOOR;
-    case 13:
-        return TEX_BRICKFLOOR;
-    case 14:
-        return TEX_GRASSFLOOR;
+    if (objType == "PointLight")
+    {
+        this->pointLights.push_back(new PointLight(glm::vec3(posX, posY, posZ)));
+        //    std::cout << "Light Point" << "\n";
+        //    break
+    }
+    else if (objType == "SpotLight") {
+        this->spotLights.push_back(new SpotLight(glm::vec3(posX, posY, posZ), glm::vec3(0.f, 90.f, 0.f)));
+        //    std::cout << "Light Spot" << "\n";
+        //    break;
+    }
+    else if(objType == "DirectionalLight") {
+        this->dirLights.push_back(new DirLight(glm::vec3(posX, posY, posZ), glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)));
+        //    std::cout << "Light Dir" << "\n";
+        //    break;
+    }
+    else {
+
+        string textureString = "Textures/" + texNum;
+        const char* beep = textureString.c_str();
+        string modelString = "Models/" + objType;
+
+        this->models.push_back(new Model(
+            glm::vec3(posX, posY, posZ),
+            this->materials[0],
+            new Texture(beep, GL_TEXTURE_2D),
+            new Texture("Textures/NANI.png", GL_TEXTURE_2D),
+            NULL,
+            NULL,
+            modelString,
+            glm::vec3(0.f, 90.f, 0.f)
+        )
+        );
     }
 }
 
@@ -313,6 +270,17 @@ void Game::initModels()
 {
     std::vector<Mesh*> meshes;
     std::vector<Mesh*> meshes2;
+    this->models.push_back(new Model(
+        glm::vec3(0, 0, 0),
+        this->materials[0],
+        new Texture("backPack/backpack_diffuse.jpg", GL_TEXTURE_2D),
+        new Texture("backPack/backpack_specular.jpg", GL_TEXTURE_2D),
+        new Texture("backPack/backpack_normal.png", GL_TEXTURE_2D),
+        new Texture("backPack/backpack_ao.jpg", GL_TEXTURE_2D),
+        "backPack/backpack.obj",
+        glm::vec3(0.f, 90.f, 0.f)
+    )
+    );
 
     //meshes.push_back(
     //    new Mesh(
@@ -376,7 +344,7 @@ void Game::initModels()
         glm::vec3(-10.f, 0.f, -10.f),
         this->materials[0],
         this->textures[TEX_SHREK],
-        this->textures[TEX_SHREK_SPECULAR],
+        this->textures[TEX_SHREK_SPECULAR], NULL, NULL,
         meshes
     )
     );
@@ -385,77 +353,78 @@ void Game::initModels()
         glm::vec3(10.f, 0.f, -10.f),
         this->materials[0],
         this->textures[TEX_NANI],
-        this->textures[TEX_NANI_SPECULAR],
+        this->textures[TEX_NANI_SPECULAR], NULL, NULL,
         meshes
     )
     );
 #pragma endregion
 
-#pragma region LEVEL MODELS
-    this->models.push_back(new Model(
-        glm::vec3(0.f, 1.f, 10.f),
-        this->materials[0],
-        this->textures[TEX_PAINTWALL],
-        this->textures[TEX_NANI_SPECULAR],
-        "Models/GADE7312_WALLS.obj",
-        glm::vec3(0.f, 90.f, 0.f)
-    )
-    );
-
-    //Floor
-    this->models.push_back(new Model(
-        glm::vec3(0.f, 1.f, 10.f),
-        this->materials[0],
-        this->textures[TEX_WALL],
-        this->textures[TEX_NANI_SPECULAR],
-        "Models/GADE7312_FLOOR.obj",
-        glm::vec3(0.f, 90.f, 0.f)
-    )
-    );
-
-    ////Roof
-    //this->models.push_back(new Model(
-    //    glm::vec3(0.f, 14.f, 10.f),
-    //    this->materials[0],
-    //    this->textures[TEX_CEILING],
-    //    this->textures[TEX_NANI_SPECULAR],
-    //    "Models/GADE7312_FLOOR.obj",
-    //    glm::vec3(0.f, 90.f, 0.f)
-    //)
-    //);
-#pragma endregion
-
-#pragma region DOOR MODELS
-    this->models.push_back(new Model(
-        glm::vec3(4.f, 0.f, 82.f),
-        this->materials[0],
-        this->textures[TEX_DOOR],
-        this->textures[TEX_NANI_SPECULAR],
-        "Models/GADE7312_Door.obj",
-        glm::vec3(0.f, 90.f, 0.f)
-    )
-    );
-
-    this->models.push_back(new Model(
-        glm::vec3(-36.f, 0.f, 51.f),
-        this->materials[0],
-        this->textures[TEX_DOOR2],
-        this->textures[TEX_NANI_SPECULAR],
-        "Models/GADE7312_Door.obj",
-        glm::vec3(0.f, 90.f, 0.f)
-    )
-    );
-
-    this->models.push_back(new Model(
-        glm::vec3(44.f, 0.f, 51.f),
-        this->materials[0],
-        this->textures[TEX_DOOR3],
-        this->textures[TEX_NANI_SPECULAR],
-        "Models/GADE7312_Door.obj",
-        glm::vec3(0.f, 90.f, 0.f)
-    )
-    );
-#pragma endregion
+   
+//#pragma region LEVEL MODELS
+//    this->models.push_back(new Model(
+//        glm::vec3(0.f, 1.f, 10.f),
+//        this->materials[0],
+//        this->textures[TEX_PAINTWALL],
+//        this->textures[TEX_NANI_SPECULAR],
+//        "Models/GADE7312_WALLS.obj",
+//        glm::vec3(0.f, 90.f, 0.f)
+//    )
+//    );
+//
+//    //Floor
+//    this->models.push_back(new Model(
+//        glm::vec3(0.f, 1.f, 10.f),
+//        this->materials[0],
+//        this->textures[TEX_WALL],
+//        this->textures[TEX_NANI_SPECULAR],
+//        "Models/GADE7312_FLOOR.obj",
+//        glm::vec3(0.f, 90.f, 0.f)
+//    )
+//    );
+//
+//    ////Roof
+//    //this->models.push_back(new Model(
+//    //    glm::vec3(0.f, 14.f, 10.f),
+//    //    this->materials[0],
+//    //    this->textures[TEX_CEILING],
+//    //    this->textures[TEX_NANI_SPECULAR],
+//    //    "Models/GADE7312_FLOOR.obj",
+//    //    glm::vec3(0.f, 90.f, 0.f)
+//    //)
+//    //);
+//#pragma endregion
+//
+//#pragma region DOOR MODELS
+//    this->models.push_back(new Model(
+//        glm::vec3(4.f, 0.f, 82.f),
+//        this->materials[0],
+//        this->textures[TEX_DOOR],
+//        this->textures[TEX_NANI_SPECULAR], NULL, NULL,
+//        "Models/GADE7312_Door.obj",
+//        glm::vec3(0.f, 90.f, 0.f)
+//    )
+//    );
+//
+//    this->models.push_back(new Model(
+//        glm::vec3(-36.f, 0.f, 51.f),
+//        this->materials[0],
+//        this->textures[TEX_DOOR2],
+//        this->textures[TEX_NANI_SPECULAR], NULL, NULL,
+//        "Models/GADE7312_Door.obj",
+//        glm::vec3(0.f, 90.f, 0.f)
+//    )
+//    );
+//
+//    this->models.push_back(new Model(
+//        glm::vec3(44.f, 0.f, 51.f),
+//        this->materials[0],
+//        this->textures[TEX_DOOR3],
+//        this->textures[TEX_NANI_SPECULAR], NULL, NULL,
+//        "Models/GADE7312_Door.obj",
+//        glm::vec3(0.f, 90.f, 0.f)
+//    )
+//    );
+//#pragma endregion
 
 
     for (auto*& i : meshes)
@@ -468,7 +437,7 @@ void Game::initModels()
 void Game::initLights()
 {
     //Directional Lighting
-    this->dirLights.push_back(new DirLight(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)));
+    this->dirLights.push_back(new DirLight(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(0.f)));
 
     //Point Lights
     //this->pointLights.push_back(new PointLight(glm::vec3(1.f)));
@@ -528,8 +497,8 @@ void Game::updateUniforms()
 
     //ProjectionMatrix = glm::mat4(1.f);
     this->ProjectionMatrix = glm::perspective(glm::radians(fov),
-        static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight, 
-        this->nearPlane, 
+        static_cast<float>(this->frameBufferWidth) / this->frameBufferHeight,
+        this->nearPlane,
         this->farPlane);
 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
@@ -541,7 +510,7 @@ void Game::updateKeyboardInputs()
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(this->window, GLFW_TRUE);
-        cout << "\n=======     Engine Closed       =======\n";
+        std::cout << "\n=======     Engine Closed       =======\n";
     }
 
     //Camera
@@ -561,6 +530,19 @@ void Game::updateKeyboardInputs()
     {
         this->camera.move(this->dt, RIGHT);
     }
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    {
+        this->camera.move(this->dt, CROUCH);
+    }
+    else if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
+        this->camera.move(this->dt, NOTCROUCH);
+    }
+    if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        this->camera.move(this->dt, JUMP);
+    }
+
+    //}
     //if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
     //{
     //    this->camPosition.y += 0.005f;
@@ -598,10 +580,10 @@ void Game::updateMouseInputs()
     this->lastMouseY = this->mouseY;
 
     //Move Light
-    if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-    {
-        this->pointLights[0]->setPosition(this->camera.getPosition());
-    }
+    //if (glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+    //{
+    //    this->pointLights[0]->setPosition(this->camera.getPosition());
+    //}
 }
 
 void Game::updateInput()
@@ -618,12 +600,12 @@ void Game::updateInput()
 //Constructors / Destructors
 Game::Game(const char* title, const int WINDOW_WIDTH,
     const int WINDOW_HEIGHT, const int GL_VERSION_MAJOR,
-    const int GL_VERSION_MINOR, bool resizeable)
+    const int GL_VERSION_MINOR, bool resizeable, string fileName)
 
-    : 
+    :
     WINDOW_WIDTH(WINDOW_WIDTH),
     WINDOW_HEIGHT(WINDOW_HEIGHT),
-    GL_VERSION_MAJOR(GL_VERSION_MAJOR), 
+    GL_VERSION_MAJOR(GL_VERSION_MAJOR),
     GL_VERSION_MINOR(GL_VERSION_MINOR),
     camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 {
@@ -658,6 +640,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->frameCount = 0;
     wantFPS = false;
 
+    this->fileName = fileName;
+
     this->initGLFW();
     this->initWindow(title, resizeable);
     this->initGLAD();
@@ -667,12 +651,36 @@ Game::Game(const char* title, const int WINDOW_WIDTH,
     this->initShaders();
     this->initTextures();
     this->initMaterials();
-    //this->initReadLevelFile();
-    this->initModels();
-    this->initLights();
+    this->initReadLevelFile();
+    //this->initModels();
+
+    //this->initLights();
     this->initUniforms();
 
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    // create depth texture
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    this->shaders[SHADER_CORE_PROGRAM]->set1i(0, "diffuseTexture");
+    this->shaders[SHADER_CORE_PROGRAM]->set1i(1, "shadowMap");
+    this->shaders[SHADER_CORE_PROGRAM]->set1i(2, "depthMap");
+    this->shaders[debugDepthQuad]->use();
+    this->shaders[debugDepthQuad]->set1i(0, "depthMap");
 }
 
 Game::~Game() {
@@ -690,7 +698,7 @@ Game::~Game() {
 
     for (auto*& i : this->models)
         delete i;
-    
+
     for (size_t i = 0; i < this->pointLights.size(); i++)
         delete this->pointLights[i];
 }
@@ -712,6 +720,23 @@ void Game::setWindowShouldClose()
 //Functions
 void Game::update()
 {
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    float near_plane = this->nearPlane, far_plane = this->farPlane;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(glm::vec3(0.f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    lightSpaceMatrix = lightProjection * lightView;
+    // render scene from light's point of view
+    this->shaders[SHADER_CORE_PROGRAM]->use();
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(lightSpaceMatrix, "lightSpaceMatrix");
+
+    glViewport(0, 0, this->WINDOW_WIDTH, this->WINDOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0);
+    this->render();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     glfwPollEvents();
     this->updateInput();
     this->updateDT();
@@ -719,8 +744,6 @@ void Game::update()
     {
         this->fpsCounter();
     }
-   /* this->models[0]->updateRotation(glm::vec3(0.f, 0.01f, 0.f));
-    this->models[1]->updateRotation(glm::vec3(0.f, 0.01f, 0.f));*/
 }
 
 void Game::render()
@@ -742,10 +765,15 @@ void Game::render()
         i->render(this->shaders[SHADER_CORE_PROGRAM]);
     }
 
+    this->shaders[debugDepthQuad]->use();
+    this->shaders[debugDepthQuad]->set1i(this->nearPlane, "near_plane");
+    this->shaders[debugDepthQuad]->set1i(this->farPlane, "far_plane");
+    this->shaders[SHADER_CORE_PROGRAM]->set1i(this->nearPlane, "near_plane");
+    this->shaders[SHADER_CORE_PROGRAM]->set1i(this->farPlane, "far_plane");
+
     //End Draw
     glfwSwapBuffers(window);
     glFlush();
-
 
 
     //Security, backup to unbind
@@ -774,12 +802,14 @@ void Game::userCommands()
     if (glfwGetKey(this->window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         string temp;
+        cout << "Type 'help' to see a list of possible commands";
         cout << "Enter a command:\n ";
         cin >> temp;
 
         if (temp == "help")
         {
-            cout << "Possible Commands: fps, triangles, load level, spawn model \n";
+            cout << "Possible Commands: fps, triangles, loadlevel, spawnmodel \n";
+            cout << "Press Enter while in game engine to access console commands again \n";
             return;
         }
         else if (temp == "fps") {
@@ -796,18 +826,86 @@ void Game::userCommands()
             }
         }
         else if (temp == "triangles") {
+            int tempNum = 0;
+            for (size_t i = 0; i < this->models.size(); i++)
+            {
+                for (Mesh* mesh : this->models[i]->meshes) {
+                    tempNum += mesh->nrOfVertices;
+                }
+            }
 
+            int numOfTriangles = 0;
+            numOfTriangles = (tempNum * 2);
+            std::cout << "Nr of Triangles: " << numOfTriangles << "\n";
+            
         }
         else if (temp == "loadlevel") {
+            bool loadGOODhere = false;
+            cout << "What level would you like to load? Type END to exit this \n";
+            string levelName;
+            cin >> levelName;
 
+            while (loadGOODhere == false)
+            {
+                if (levelName == "END")
+                {
+                    cout << "\n BACK TO GAME! \n";
+                    return;
+                }
+                else
+                {
+                    levelName = "CSVFile/" + levelName;
+                    ifstream input_file(levelName);
+                    if (!input_file.is_open())
+                    {
+                        cout << "FILE NOT FOUND! \n";
+                        cout << "What level would you like to load? Type END to exit this \n";
+                        cin >> levelName;
+                    }
+                    else {
+                        loadGOODhere = true;
+                        input_file.close();
+                    }
+                }
+            }
+
+            this->fileName = levelName;
+            this->models.clear();
+            this->initReadLevelFile();
+            cout << "Level Loaded \n";
         }
         else if (temp == "spawnmodel") {
+            bool loadGOODhere = false;
+
             string fileName;
             float xPos, yPos, zPos;
             float xRot, yRot, zRot;
-            cout << "Please enter file Name, include file type extension in the name \n ";
+            cout << "Please enter file Name, include file type extension in the name. Type END to exit this \n ";
             cin >> fileName;
             fileName = "Models/" + fileName;
+
+            while (loadGOODhere == false) {
+                if (fileName == "END")
+                {
+                    cout << "\n BACK TO GAME! \n";
+                    return;
+                }
+                else {
+                    fileName = "Models/" + fileName;
+                    ifstream input_file(fileName);
+                    if (!input_file.is_open())
+                    {
+                        cout << "FILE NOT FOUND! \n";
+                        cout << "What model would you like to load? Type END to exit this \n";
+                        cin >> fileName;
+                    }
+                    else {
+                        loadGOODhere = true;
+                        input_file.close();
+                    }
+                }
+            }
+
             cout << "Please enter X Position \n ";
             cin >> xPos;
             cout << "Please enter Y Position \n ";
@@ -820,6 +918,8 @@ void Game::userCommands()
                 this->materials[0],
                 this->textures[TEX_PAINTWALL],
                 this->textures[TEX_NANI_SPECULAR],
+                NULL,
+                NULL,
                 fileName,
                 glm::vec3(0.f, 90.f, 0.f)
             )
@@ -829,6 +929,7 @@ void Game::userCommands()
         }
         else {
             cout << "Incorrect Command, please return to game engine window and press enter to open command prompt\n ";
+            cout << "Press Enter while in game engine to access console commands again \n";
             return;
         }
     }
@@ -837,6 +938,6 @@ void Game::userCommands()
 
 //Static Functions
 void Game::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    
+
     glViewport(0, 0, width, height);
 }

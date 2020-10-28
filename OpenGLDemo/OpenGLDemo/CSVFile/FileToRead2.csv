@@ -1,0 +1,4 @@
+GADE7312_WALLS.obj;wooden_wall.jpg;0;1;10;0;90;0;
+GADE7312_FLOOR.obj;stone_floor.png;0;1;10;0;90;0;
+GADE7312_FLOOR.obj;tiled_ceiling.jpg;0;14;10;0;90;0;
+DirectionalLight;0;0;0;0;0;0;0;

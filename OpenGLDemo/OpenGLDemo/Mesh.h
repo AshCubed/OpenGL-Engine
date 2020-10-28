@@ -11,7 +11,7 @@
 class Mesh {
 private:
 	Vertex* vertexArray;
-	unsigned nrOfVertices;
+
 	GLuint* indexArray;
 	unsigned nrOfIndicies;
 
@@ -24,6 +24,9 @@ private:
 	glm::vec3 rotation;
 	glm::vec3 scale;
 	glm::mat4 ModelMatrix;
+
+	std::vector<glm::vec3> tangents;
+	std::vector<glm::vec3> bitangents;
 	
 	void initVAO() {
 		//GEN VAO and BIND
@@ -57,6 +60,41 @@ private:
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
 		glEnableVertexAttribArray(3);
 
+		//GLuint tangentbuffer;
+		//glGenBuffers(1, &tangentbuffer);
+		//glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);
+		//glBufferData(GL_ARRAY_BUFFER, tangents.size() * sizeof(glm::vec3), &tangents[0], GL_STATIC_DRAW);
+		//	
+		//GLuint bitangentbuffer;
+		//glGenBuffers(1, &bitangentbuffer);
+		//glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);
+		//glBufferData(GL_ARRAY_BUFFER, bitangents.size() * sizeof(glm::vec3), &bitangents[0], GL_STATIC_DRAW);
+
+		//// 4th attribute buffer : tangents
+		//glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);
+		//glVertexAttribPointer(
+		//	4,                                // attribute
+		//	3,                                // size
+		//	GL_FLOAT,                         // type
+		//	GL_FALSE,                         // normalized?
+		//	0,                                // stride
+		//	(void*)0                          // array buffer offset
+		//);
+		//glEnableVertexAttribArray(4);
+
+		//// 5th attribute buffer : bitangents
+		//glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);
+		//glVertexAttribPointer(
+		//	5,                                // attribute
+		//	3,                                // size
+		//	GL_FLOAT,                         // type
+		//	GL_FALSE,                         // normalized?
+		//	0,                                // stride
+		//	(void*)0                          // array buffer offset
+		//);
+		//glEnableVertexAttribArray(5);
+
+
 		//BIND VAO 0
 		glBindVertexArray(0);
 	}
@@ -75,8 +113,54 @@ private:
 		this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);
 	}
 
+	void computeTangentBasis(
+		// inputs
+	)
+	{
+		tangents.clear();
+		bitangents.clear();
+
+		for (int i = 0; i < this->nrOfVertices; i += 3) {
+
+			// Shortcuts for vertices
+			glm::vec3& v0 = this->vertexArray[i + 0].position;
+			glm::vec3& v1 = this->vertexArray[i + 1].position;
+			glm::vec3& v2 = this->vertexArray[i + 2].position;
+
+			// Shortcuts for UVs
+			glm::vec2& uv0 = this->vertexArray[i + 0].texcoord;
+			glm::vec2& uv1 = this->vertexArray[i + 1].texcoord;
+			glm::vec2& uv2 = this->vertexArray[i + 2].texcoord;
+
+			// Edges of the triangle : position delta
+			glm::vec3 deltaPos1 = v1 - v0;
+			glm::vec3 deltaPos2 = v2 - v0;
+
+			// UV delta
+			glm::vec2 deltaUV1 = uv1 - uv0;
+			glm::vec2 deltaUV2 = uv2 - uv0;
+
+			float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+			glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+			glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+
+			// Set the same tangent for all three vertices of the triangle.
+			// They will be merged later, in vboindexer.cpp
+			tangents.push_back(tangent);
+			tangents.push_back(tangent);
+			tangents.push_back(tangent);
+
+			// Same thing for bitangents
+			bitangents.push_back(bitangent);
+			bitangents.push_back(bitangent);
+			bitangents.push_back(bitangent);
+		}
+	}
+
 
 public:
+	unsigned nrOfVertices;
+
 	Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndicies, 
 		glm::vec3 position = glm::vec3(0.f),
 		glm::vec3 origin = glm::vec3(0.f),
@@ -103,6 +187,7 @@ public:
 			this->indexArray[i] = indexArray[i];
 		}
 
+		this->computeTangentBasis();
 		this->initVAO();
 		this->updateModelMatrix();
 	}

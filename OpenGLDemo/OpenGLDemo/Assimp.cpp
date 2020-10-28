@@ -3,13 +3,13 @@ ModelManager::ModelManager()
 {
     vertexBuff.clear();
     indexBuff.clear();
-    std::cout << "=======Mesh Manager  initialized=======" << std::endl;
+    //std::cout << "=======Mesh Manager  initialized=======" << std::endl;
 
 }
 
 ModelManager::~ModelManager(void)
 {
-    std::cout << "ModelManager destroyed" << std::endl;
+    //std::cout << "ModelManager destroyed" << std::endl;
 }
 
 bool ModelManager::loadModel(std::string file)
@@ -100,7 +100,6 @@ bool ModelManager::processData()
                 for (unsigned int c = 0; c < modelNode->mNumChildren; c++)
                 {
                     nodeBuff.push_back(modelNode->mChildren[c]);
-
                 }
 
             else repeat = false;
@@ -130,3 +129,7 @@ std::vector<GLint>* ModelManager::getIndexData()
 {
     return &indexBuff;
 }
+
+
+
+

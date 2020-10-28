@@ -18,6 +18,8 @@ private:
     glm::vec3 specular;
     GLint diffuseTex;
     GLint specularTex;
+    GLint normalTex;
+    GLint bumpTex;
 
 
 public:
@@ -26,13 +28,17 @@ public:
     glm::vec3 diffues,
     glm::vec3 specular,
     GLint diffuseTex,
-    GLint specularTex)
+    GLint specularTex,
+    GLint normalTex,
+    GLint bumpTex)
     {
         this->ambient = ambient;
         this->diffues = diffues;
         this->specular = specular;
         this->diffuseTex = diffuseTex;
         this->specularTex = specularTex;
+        this->normalTex = normalTex;
+        this->bumpTex = bumpTex;
 	}
 
     ~Material(){}
@@ -44,5 +50,7 @@ public:
         programID.setVec3f(this->specular, "material.specular");
         programID.set1i(this->diffuseTex, "material.diffuseTex");
         programID.set1i(this->specularTex, "material.specularTex");
+        programID.set1i(this->normalTex, "material.normalTex");
+        programID.set1i(this->normalTex, "material.bumpTex");
     }
 };

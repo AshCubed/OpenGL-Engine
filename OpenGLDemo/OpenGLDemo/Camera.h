@@ -8,7 +8,8 @@
 #include<glm/mat4x4.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 
-enum direction {FORWARD = 0, BACKWARD, LEFT, RIGHT};
+enum direction {FORWARD = 0, BACKWARD, LEFT, RIGHT, CROUCH, NOTCROUCH, JUMP
+};
 
 class Camera {
 private:
@@ -27,6 +28,11 @@ private:
 	GLfloat yaw;
 	GLfloat roll;
 
+	bool isCrouching = false;
+
+	glm::vec3 OGPos;
+
+
 	void updateCameraVectors() {
 		this->front.x = cos(glm::radians(this->yaw) * cos(glm::radians(this->pitch)));
 		this->front.y = sin(glm::radians(this->pitch));
@@ -36,6 +42,42 @@ private:
 		this->right = glm::normalize(glm::cross(this->front, this->worldUp));
 		this->up = glm::normalize(glm::cross(this->right, this->front));
 	};
+
+
+	bool jumping = false;
+	bool falling = false;
+	float jumpHeight;
+	float jumpSpeed = 1.f;
+	float jumpLand;
+
+	void startJump(float height, float land) {
+		jumpHeight = height;
+		jumpLand = land;
+		if (falling == false && jumping == false)
+			jumping = true;
+	}
+
+	void jump(const float& dt) { // called every frame
+		if (jumping) {
+			if (this->position.y >= jumpHeight) {
+				this->position.y -= jumpSpeed  * dt * 5.f;
+			}
+			else {
+				jumping = false;
+				falling = true;
+			}
+		}
+		else if (falling) {
+			if (this->position.y <= jumpLand) {
+				this->position.y += jumpSpeed * dt * 5.f;
+			}
+			else {
+				jumping = false;
+				falling = false;
+				isJumping = false;
+			}
+		}
+	}
 
 public:
 	Camera(glm::vec3 Position, glm::vec3 direction, glm::vec3 worldUp) {
@@ -71,6 +113,8 @@ public:
 		return this->position;
 	}
 
+	bool isJumping = false;
+
 	//Functions
 	void move(const float& dt, const int direction) {
 		//Update position vector
@@ -87,6 +131,28 @@ public:
 			break;
 		case RIGHT:
 			this->position += this->right * this->movementSpeed * dt;
+			break;
+		case CROUCH:
+			if (isCrouching == false)
+			{
+				this->position -= glm::vec3(0, 2.f, 0);
+				isCrouching = true;
+			}
+			break;
+		case NOTCROUCH:
+			if (isCrouching == true)
+			{
+				this->position += glm::vec3(0, 2.f, 0);
+				isCrouching = false;
+			}
+			break;
+		case JUMP:
+			if (isJumping == false)
+			{
+				startJump(0.f, 4.f);
+				jump(dt);
+
+			}
 			break;
 		default:
 			break;

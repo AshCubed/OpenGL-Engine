@@ -27,15 +27,18 @@
     <ClCompile Include="Assimp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowMapFBO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="vertexShader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="debug_quad_depthFS.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="debug_quadVS.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -77,9 +80,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Assimp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowMapFBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

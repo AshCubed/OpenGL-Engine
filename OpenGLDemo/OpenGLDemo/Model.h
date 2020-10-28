@@ -11,8 +11,10 @@ private:
 	Material* material;
 	Texture* overrideTextureDiffuse;
 	Texture* overrideTextureSpecular;
+	Texture* overrideTextureNorm;
+	Texture* overrideTextureBump;
 
-	std::vector<Mesh*> meshes;
+
 	glm::vec3 position;
 	glm::vec3 rotation;
 
@@ -22,11 +24,15 @@ private:
 
 
 public:
+	std::vector<Mesh*> meshes;
+
 	Model(
 		glm::vec3 position, 
 		Material* material, 
 		Texture* overrideTexDif, 
 		Texture* overrideTexSpec,
+		Texture* overrideTexNorm,
+		Texture* overrideTexBump,
 		std::vector<Mesh*> meshes,
 		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f))
 	{
@@ -51,6 +57,8 @@ public:
 		Material* material,
 		Texture* overrideTexDif,
 		Texture* overrideTexSpec,
+		Texture* overrideTexNorm,
+		Texture* overrideTexBump,
 		string obj_file,
 		glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f))
 	{
@@ -59,10 +67,13 @@ public:
 		this->material = material;
 		this->overrideTextureDiffuse = overrideTexDif;
 		this->overrideTextureSpecular = overrideTexSpec;
+		this->overrideTextureNorm = overrideTexNorm;
+		this->overrideTextureBump = overrideTexBump;
 
 		ModelManager model = ModelManager();
 		model.loadModel(obj_file);
 		std::vector<Vertex> temp = *model.getVertexData();
+
 
 		this->meshes.push_back(new Mesh(temp.data(), temp.size(), NULL, 0, glm::vec3(1.f, 0.f, 0.f),
 			glm::vec3(0.f),
@@ -80,6 +91,8 @@ public:
 			delete i;
 		}
 	}
+
+
 
 	//Functions
 	void updateRotation(const glm::vec3 rotation) {
@@ -119,5 +132,5 @@ public:
 		}
 	}
 
-
+	
 };

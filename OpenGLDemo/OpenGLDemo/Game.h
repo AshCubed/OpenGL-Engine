@@ -1,10 +1,11 @@
 #pragma once
 #include"libs.h"
 #include "Camera.h"
+using namespace std;
 
 //ENUMERATIONS
 enum shader_enums {
-	SHADER_CORE_PROGRAM = 0
+	SHADER_CORE_PROGRAM = 0, debugDepthQuad
 };
 enum texture_enum {
 	TEX_NANI = 0, TEX_NANI_SPECULAR, TEX_SHREK, TEX_SHREK_SPECULAR, 
@@ -83,6 +84,7 @@ private:
 	boolean wantFPS;
 
 	//for file reading
+	string fileName;
 	int col;
 	int row;
 
@@ -99,8 +101,7 @@ private:
 	//Level file reading
 	int initReadLevelCols(string fileName);
 	void initReadLevelFile();
-	void ObjType(int objType, int texNum, int posX, int posY, int posZ);
-	texture_enum ObjTex(int num);
+	void ObjType(string objType, string texNum, int posX, int posY, int posZ);
 
 	void initModels();
 	void initLights();
@@ -123,7 +124,7 @@ public:
 	Game(
 		const char* title, const int WINDOW_WIDTH,
 		const int WINDOW_HEIGHT, const int GL_VERSION_MAJOR,
-		const int GL_VERSION_MINOR, bool resizeable);
+		const int GL_VERSION_MINOR, bool resizeable, string fileName);
 
 	virtual ~Game();
 
