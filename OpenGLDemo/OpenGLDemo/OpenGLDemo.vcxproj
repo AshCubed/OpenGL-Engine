@@ -150,9 +150,11 @@
     <ClCompile Include="OpenGLDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="debug_quadVS.glsl" />
-    <None Include="debug_quad_depthFS.glsl" />
+    <None Include="cubeMapFrag .glsl" />
+    <None Include="cubeMapVert.glsl" />
     <None Include="fragmentShader.glsl" />
+    <None Include="skyBoxFrag.glsl" />
+    <None Include="skyboxVert.glsl" />
     <None Include="vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>

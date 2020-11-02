@@ -4,13 +4,11 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\shared\minwindef.h(1
 D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\Dependencies\GLAD\include\glad\glad.h(32): message : see previous definition of 'APIENTRY'
 D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Model.h(46,1): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
 D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Model.h(81,1): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(341,5): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(769,46): warning C4244: 'argument': conversion from 'float' to 'GLint', possible loss of data
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(770,46): warning C4244: 'argument': conversion from 'float' to 'GLint', possible loss of data
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(771,51): warning C4244: 'argument': conversion from 'float' to 'GLint', possible loss of data
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(772,51): warning C4244: 'argument': conversion from 'float' to 'GLint', possible loss of data
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(796,24): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(882,25): warning C4101: 'yRot': unreferenced local variable
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(882,31): warning C4101: 'zRot': unreferenced local variable
-D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(882,19): warning C4101: 'xRot': unreferenced local variable
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(441,5): warning C4316: 'Mesh': object allocated on the heap may not be aligned 16
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(901,51): warning C4244: 'argument': conversion from 'float' to 'GLint', possible loss of data
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(902,51): warning C4244: 'argument': conversion from 'float' to 'GLint', possible loss of data
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(958,24): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(1044,25): warning C4101: 'yRot': unreferenced local variable
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(1044,31): warning C4101: 'zRot': unreferenced local variable
+D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\OpenGLDemo\Game.cpp(1044,19): warning C4101: 'xRot': unreferenced local variable
   OpenGLDemo.vcxproj -> D:\VEGA\Vega - Year 3 Semester 2\Game Development 3B\Assignment Work\GADE3B-Task\OpenGLDemo\Debug\OpenGLDemo.exe

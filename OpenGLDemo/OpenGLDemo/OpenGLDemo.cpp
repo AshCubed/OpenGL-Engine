@@ -54,7 +54,6 @@ int main(void)
     {
         //UDATE INPUT
         game.update();
-        //game.render();
         game.userCommands();
     }
 

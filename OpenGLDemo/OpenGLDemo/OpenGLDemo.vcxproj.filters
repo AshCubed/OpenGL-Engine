@@ -35,10 +35,16 @@
     <None Include="vertexShader.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="debug_quad_depthFS.glsl">
+    <None Include="skyBoxFrag.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="debug_quadVS.glsl">
+    <None Include="skyboxVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="cubeMapFrag .glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="cubeMapVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

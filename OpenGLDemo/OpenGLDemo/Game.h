@@ -5,7 +5,7 @@ using namespace std;
 
 //ENUMERATIONS
 enum shader_enums {
-	SHADER_CORE_PROGRAM = 0, debugDepthQuad
+	SHADER_CORE_PROGRAM = 0, skyBoxShader, cubeMapShader
 };
 enum texture_enum {
 	TEX_NANI = 0, TEX_NANI_SPECULAR, TEX_SHREK, TEX_SHREK_SPECULAR, 
@@ -88,6 +88,11 @@ private:
 	int col;
 	int row;
 
+	//skybox
+	unsigned int skyboxVAO, skyboxVBO;
+	unsigned int cubeVAO, cubeVBO;
+	unsigned int cubemapTexture;
+
 //Private Functions
 	void initGLFW();
 	void initWindow(const char* title, bool resizeable);
@@ -106,6 +111,7 @@ private:
 	void initModels();
 	void initLights();
 	void initUniforms();
+	unsigned int loadCubemap(vector<std::string> faces);
 
 	void updateUniforms();
 	//Inputs
@@ -113,7 +119,6 @@ private:
 	void updateDT();
 	void updateMouseInputs();
 	void updateInput();
-
 	void fpsCounter();
 
 

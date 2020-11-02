@@ -1,6 +1,6 @@
 GADE7312_WALLS.obj;wooden_wall.jpg;0;1;10;0;90;0;
 GADE7312_FLOOR.obj;stone_floor.png;0;1;10;0;90;0;
-GADE7312_FLOO.obj;tiled_ceiling.jpg;0;14;10;0;90;0;
+GADE7312_FLOOR.obj;tiled_ceiling.jpg;0;14;10;0;90;0;
 GADE7312_Door.obj;Door.jpg;4;0;82;0;90;0;
 GADE7312_Door.obj;door_tex2.jpg;-36;0;51;0;90;0;
 GADE7312_Door.obj;door_tex.jpg;44;0;51;0;90;0;

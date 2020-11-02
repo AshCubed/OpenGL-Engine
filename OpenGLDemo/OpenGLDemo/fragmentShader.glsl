@@ -218,9 +218,6 @@ void main()
 
         temp += finalSpot;
     }
-
-        
-        
         
 
         fs_color = texture(material.diffuseTex, vs_texcoord) * 
