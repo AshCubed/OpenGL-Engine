@@ -40,7 +40,6 @@ int main(void)
                 input_file.close();
             }
         }
-        
     }
 
     Game game("Ashveer Jugdav 17611612", 640, 480, 3, 3, true, temp);

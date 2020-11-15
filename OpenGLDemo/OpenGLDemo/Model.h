@@ -48,7 +48,6 @@ public:
 
 		this->updateMovement(this->position);
 		this->updateRotation(this->rotation);
-
 	}
 
 	//OBJ File Loaded model

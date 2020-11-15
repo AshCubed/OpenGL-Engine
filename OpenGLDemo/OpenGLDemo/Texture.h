@@ -41,6 +41,7 @@ public:
         else
         {
             cout << "ERROR::TEXTURE::TEXTURE_LOADING_FAILED" << fileName << "\n";
+            return;
         }
 
         glActiveTexture(0);

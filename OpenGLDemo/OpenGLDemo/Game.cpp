@@ -154,8 +154,9 @@ void Game::initOpenGLOptions()
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    glDisable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -601,7 +602,6 @@ unsigned int Game::loadCubemap(vector<std::string> faces)
     return textureID;
 }
 
-
 void Game::updateUniforms()
 {
     //Update View Matix (camera)
@@ -965,7 +965,7 @@ void Game::userCommands()
     {
         string temp;
         cout << "Type 'help' to see a list of possible commands";
-        cout << "Enter a command:\n ";
+        cout << "Enter a command:\n";
         cin >> temp;
 
         if (temp == "help")
@@ -1037,16 +1037,19 @@ void Game::userCommands()
             cout << "Level Loaded \n";
         }
         else if (temp == "spawnmodel") {
-            bool loadGOODhere = false;
+            bool loadModelFileGOODhere = false;
+            bool loadTexFileGOODHere = false;
 
             string fileName;
+            string texFileName;
             float xPos, yPos, zPos;
             float xRot, yRot, zRot;
-            cout << "Please enter file Name, include file type extension in the name. Type END to exit this \n ";
+            cout << "Please enter file Name, include file type extension in the name. Type END to exit this \n";
             cin >> fileName;
-            fileName = "Models/" + fileName;
+            //fileName = "Models/" + fileName;
 
-            while (loadGOODhere == false) {
+            //If Model File exists
+            while (loadModelFileGOODhere == false) {
                 if (fileName == "END")
                 {
                     cout << "\n BACK TO GAME! \n";
@@ -1062,35 +1065,71 @@ void Game::userCommands()
                         cin >> fileName;
                     }
                     else {
-                        loadGOODhere = true;
+                        loadModelFileGOODhere = true;
                         input_file.close();
                     }
                 }
             }
 
-            cout << "Please enter X Position \n ";
+            cout << "Please enter texture file Name, include file type extension in the name. Type END to exit this \n";
+            cout << "Type NULL for default texture \n ";
+            cin >> texFileName;
+            //texFileName = "Textures/" + texFileName;
+
+            while (loadTexFileGOODHere == false)
+            {
+                if (texFileName == "END")
+                {
+                    cout << "\n BACK TO GAME! \n";
+                    return;
+                }
+                else if(texFileName == "NULL"){
+                    //Default Texture
+                    texFileName = "Textures/NANI.png";
+                    loadTexFileGOODHere = true;
+                }
+                else {
+                    texFileName = "Textures/" + texFileName;
+                    ifstream input_file(texFileName);
+                    if (!input_file.is_open())
+                    {
+                        cout << "FILE NOT FOUND! \n";
+                        cout << "What texture would you like to load? Type END to exit this, NULL for default texture \n";
+                        cin >> texFileName;
+                    }
+                    else {
+                        loadTexFileGOODHere = true;
+                        input_file.close();
+                    }
+                }
+            }
+
+            cout << "Please enter X Position \n";
             cin >> xPos;
-            cout << "Please enter Y Position \n ";
+            cout << "Please enter Y Position \n";
             cin >> yPos;
-            cout << "Please enter Z Position \n ";
+            cout << "Please enter Z Position \n";
             cin >> zPos;
+
+            const char* beep = texFileName.c_str();
 
             this->models.push_back(new Model(
                 glm::vec3(xPos, yPos, zPos),
                 this->materials[0],
-                this->textures[TEX_PAINTWALL],
-                this->textures[TEX_NANI_SPECULAR],
+                new Texture(beep, GL_TEXTURE_2D),
+                new Texture("Textures/NANI.png", GL_TEXTURE_2D),
                 NULL,
                 NULL,
                 fileName,
                 glm::vec3(0.f, 90.f, 0.f)
             )
             );
-            cout << "Model Loaded \n ";
+
+            cout << "Model Loaded \n";
             return;
         }
         else {
-            cout << "Incorrect Command, please return to game engine window and press enter to open command prompt\n ";
+            cout << "Incorrect Command, please return to game engine window and press enter to open command prompt\n";
             cout << "Press Enter while in game engine to access console commands again \n";
             return;
         }
