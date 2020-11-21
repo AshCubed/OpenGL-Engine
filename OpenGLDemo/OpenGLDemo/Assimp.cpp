@@ -14,7 +14,7 @@ ModelManager::~ModelManager(void)
 
 bool ModelManager::loadModel(std::string file)
 {
-    modelScene = importer.ReadFile(file, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_PreTransformVertices |
+    modelScene = importer.ReadFile(file, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder |  aiProcess_PreTransformVertices |
         aiProcess_CalcTangentSpace |
         aiProcess_GenSmoothNormals |
         aiProcess_Triangulate |

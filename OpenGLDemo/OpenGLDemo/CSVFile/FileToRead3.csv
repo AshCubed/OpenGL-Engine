@@ -25,4 +25,7 @@ HiterBluePosters.obj;HitlerPosterBake.jpg;0;0;0;0;0;0;
 HiterBrownPosters.obj;HitlerPosterBrownBake.jpg;0;0;0;0;0;0;
 Floor.obj;FloorBake.png;0;0;0;0;0;0;
 Floor.obj;FloorBake.png;0;30;0;0;0;0;
+PointLight;0;100;0;0;0;0;0;
+PointLight;0;-100;0;0;0;0;0;
 DirectionalLight;0;0;0;0;0;0;0;
+PointLight;0;0;0;300;0;0;0;
